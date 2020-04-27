@@ -62,10 +62,8 @@
                 })
                 .then(res =>{
                     //this.token = res.data.token;
-                    if(res.data.codigo == 0){
+                    if(res.data.codigo == 0)
                         this.variable=res.data.mensaje
-                        localStorage.estadoSesion = ""
-                    }
                     else
                         this.variable=res.data.mensaje
                 })

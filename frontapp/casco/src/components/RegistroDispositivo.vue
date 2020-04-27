@@ -1,13 +1,12 @@
 <template>
 
- <div id= "registroDisp">
+ <div id= "signup">
     <router-view/>
     <!--h3>Registro</h3-->
-    <h2>Registro Dispositivo</h2>
     <div>{{variable}}</div>
     <div>Nombre</div>
-    <input type="text" v-model="nombreDisp" v-on:keyup.13="registrar()"><br><br>
-    <button type="button" v-on:click="registrar()">Registrar dispositivo</button>
+    <input type="text" v-model="nombreDisp"><br>
+    <button type="button" v-on:click="registar()">Registrar dispositivo</button>
  </div>
 
 </template>
@@ -22,24 +21,6 @@
                 nombreDisp: null,
             };
         },
-		created: function(){
-			const headers = {
-                'acces-token' : localStorage.tokenSession,
-                'Authorization' : 'JWT fefege...'
-            }
-            var data = {
-            	correo : ""
-            }
-            axios.post('http://localhost:3000/consultaToken',data,{
-                headers : headers
-            })
-            .then(res =>{
-            	if(res.data.codigo == 0){
-            		this.$router.push("/")
-      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
-            	}
-            })
-		},
         /*created: function(){
             axios.post('http://localhost:3000/consulta').then(res =>{
                 this.users = res.data;
@@ -48,11 +29,12 @@
         methods:{
             registrar(){
                 const headers = {
-                    'acces-token' : localStorage.tokenSession,
+                    'Content-Type' : 'application/json',
                     'Authorization' : 'JWT fefege...'
                 }
                 var data = {
-                    'nombreDisp' : this.nombreDisp
+                    'nombreDisp' : this.nombreDisp,
+                    'correoUsuario' : "matallana@mail.com"
                 }
                 axios.post('http://localhost:3000/registroDispositivo', data,{
                     headers : headers
@@ -95,12 +77,12 @@
 </script>
 
 <style>
-    #registroDisp {
+    #signup {
         width: 500px;
         border: 1px solid #CCCCCC;
         background-color: #FFFFFF;
         margin: auto;
-        margin-top: 10px;
+        margin-top: 20px;
         padding: 20px;
     }
 </style>

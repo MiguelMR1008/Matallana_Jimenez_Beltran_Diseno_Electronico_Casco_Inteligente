@@ -1,22 +1,22 @@
 <template>
-  <div class="signup">
+  <div class="registroData">
     <div id="nave">
-      <div>¿Desea iniciar sesión? pulse el siguiente enlace
-      <router-link to="/">Iniciar sesión</router-link></div>
+      <div>
+      <router-link to="/home">Volver</router-link></div>
     </div>
-    <h1>Registro</h1>
-    <Signup />
+    <h1>Registro Dispositivo</h1>
+    <RegistroDipositivo />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Signup from '@/components/Signup.vue'
+import RegistroDipositivo from '@/components/RegistroDispositivo.vue'
 
 export default {
-  name: 'Registrarse',
+  name: 'RegistrarDisp',
   components: {
-    Signup
+    RegistroDipositivo
   }
 }
 </script>

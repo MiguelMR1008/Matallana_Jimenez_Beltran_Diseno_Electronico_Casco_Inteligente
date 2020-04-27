@@ -11,11 +11,6 @@ import Login from '@/components/Login.vue'
 
 export default {
   name: 'Inicio',
-  /*data(){
-  	return{
-  		variable: localStorage.estadoSesion,
-  	};
-  },*/
   components: {
     Login
   }

@@ -46,6 +46,22 @@
 			})
 		},
 		methods:{
+			login(){
+				const headers = {
+					'Content-Type' : 'application/json',
+					'Authorization' : 'JWT fefege...'
+				}
+				var data = {
+					'correo' : correo,
+					'clave' : clave
+				}
+				axios.post('http://localhost:3000/autenticar', data,{
+					headers : headers
+				})
+				.then(res =>{
+					this.variable = res;
+				})
+			}
 		}
 	}
 </script>

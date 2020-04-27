@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-  	<a id="logout" v-on:click="cerrarSesion()">Cerrar sesión</a>
     <HomeScreen />
   </div>
 </template>
@@ -13,11 +12,6 @@ export default {
   name: 'Home',
   components: {
     HomeScreen
-  },methods:{
-  	cerrarSesion(){
-  		localStorage.tokenSession=" "
-  		this.$router.push("/")
-  	}
   }
 }
 </script>

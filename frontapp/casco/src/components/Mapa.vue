@@ -1,79 +1,103 @@
 <template>
- 	<div id="mapid"></div>
+
+  <div style="height: 500px; width: 100%">
+    <div style="height: 200px overflow: auto;">
+      <p>Coordenadas casco:  {{ Coordenadas1 }}</p>
+      <p>Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p>
+      <button @click="centrarMapa2">
+        Ubicacion1
+      </button>
+      <button v-on:click="centrarMapa">
+        Ubicacion2
+      </button> 
+    </div>
+    <l-map
+      :zoom="zoom"
+      :center="center"
+      :options="mapOptions"
+      style="height: 80%"
+      @update:center="centerUpdate"
+      @update:zoom="zoomUpdate"
+
+    >
+      <l-tile-layer
+        :url="url"
+        :attribution="attribution"
+      />
+
+      <l-marker :lat-lng="CoordCasco">
+        <l-tooltip :options="{ permanent: true, interactive: true }">
+          <div>
+            Tu ubicacion
+          </div>
+        </l-tooltip>
+      </l-marker>
+
+      <l-marker   :lat-lng="Coordenadas1" >
+        <l-tooltip :options="{ permanent: true, interactive: true }">
+          <div>
+            Ubicacion actual casco
+          </div>
+        </l-tooltip>
+      </l-marker>
+    </l-map>
+  </div>
 </template>
 
 <script>
-	import axios from 'axios';
-	export default {
-		name: 'Map',
-		data(){
-			return{
-				nombre: localStorage.nombreUsuario,
-				apellido: localStorage.apellidoUsuario,
-				registros: null,
-				variable: null,
-				IDdisp: null,
-				intensidadGolpe: null,
-				latitud: null,
-				longitud: null,
-				nivelBateria: null,
-				fechaRegis: null,
-			};
-		},
-		created: function(){
-			src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-			   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-			   crossorigin=""
-			var mymap = L.map('mapid').setView([51.505, -0.09], 13);
- 		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-		    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-		    maxZoom: 18,
-		    id: 'mapbox/streets-v11',
-		    tileSize: 512,
-		    zoomOffset: -1,
-		    accessToken: 'your.mapbox.access.token'
-		}).addTo(mymap);
-			/*var mymap = L.map('mapid').setView([51.505, -0.09], 13);
-			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-			}).addTo(map);
+import { latLng } from "leaflet";
+import { LMap, LTileLayer, LMarker, LTooltip } from "vue2-leaflet"
+var CoordLat = 4.665918;
+var CoordLong = -74.059916;
 
-			L.marker([51.5, -0.09]).addTo(map)
-			    .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-			    .openPopup();
-			/*const headers = {
-                'acces-token' : localStorage.tokenSession,
-                'Authorization' : 'JWT fefege...'
-            }
-            var data = {
-            	correo : ""
-            }
-            axios.post('http://localhost:3000/consultaToken',data,{
-                headers : headers
-            })
-            .then(res =>{
-            	if(res.data.codigo == 0){
-            		this.$router.push("/")
-      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
-            	}
-            })*/
-		},
-		methods:{
-			login(){
-			},
-			goRegDisp(){
-				this.$router.push("/config")
-			},
-			goUbicaciones(){
-				this.$router.push("/data")
-			},
-			goConfig(){
-				this.$router.push("/config")
-			}
-		},
-	}
+var CascoLat = 4.782904;
+var CascoLong= -74.044923;
+export default {
+  name: "Mapa",
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LTooltip
+  },
+  data() {
+    return {
+      zoom: 13,
+      center: latLng(CoordLat , CoordLong),
+      //CoordCasco: latLng(4.782904,   -74.044923),
+      CoordCasco: latLng(CascoLat,CascoLong),
+      Coordenadas1: latLng(CoordLat, CoordLong),
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution:
+        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      withPopup: latLng(CoordLat, CoordLong),
+      currentZoom: 11.5,
+      currentCenter: latLng(CoordLat, CoordLong),
+      showParagraph: false,
+      mapOptions: {
+        zoomSnap: 0.5
+      },
+      showMap: true
+    };
+  },
+  methods: {
+    zoomUpdate(zoom) {
+      this.currentZoom = zoom;
+    },
+    centerUpdate(center) {
+      this.currentCenter = center;
+    },  
+    centrarMapa2() {
+      this.center = [CascoLat,CascoLong];
+    },
+    innerClick() {
+      alert("Esta es la ubicacion actual");
+    },
+    centrarMapa: function() {
+      CoordLat= CoordLat+0.001;
+      this.center = [CoordLat,CoordLong];
+      this.Coordenadas1 = [CoordLat,CoordLong]; //Tambien toca actualizar asi
+    }
+  }
+};
 </script>
-
-<style>
-	#mapid { height: 180px; }
-</style>

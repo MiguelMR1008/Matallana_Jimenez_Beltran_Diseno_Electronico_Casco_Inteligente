@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+        <Mapa></Mapa>
     <div id="nav">
       <!--router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link-->
@@ -7,7 +8,15 @@
     <router-view/>
   </div>
 </template>
-
+<script>
+import Mapa from './components/Mapa.vue'
+export default {
+  name: 'App',
+  components: {
+    Mapa
+  }
+}
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
