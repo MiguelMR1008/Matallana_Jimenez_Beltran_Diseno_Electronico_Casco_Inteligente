@@ -22,6 +22,14 @@ Vue.component('v-tilelayer', LTileLayer);
 Vue.component('v-marker', LMarker);
 
 new Vue({
+  data: {
+  	tokenSession: '',
+  	estadoSesion: '',
+  	nombreUsuario: '',
+  	apellidoUsuario: '',
+  	latitudCasco: 4.517388,
+  	longitudCasco: -74.106131
+  },
   router,
   render: function (h) { return h(App) }
 }).$mount('#app')

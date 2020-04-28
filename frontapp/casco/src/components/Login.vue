@@ -3,7 +3,7 @@
     <h3>Inicio de Sesión</h3>
     <div>{{variable}}</div>
     <input type="text" v-model="correo" placeholder="Correo"><br>
-    <input type="password" v-model="clave" placeholder="Contraseña"><br><br>
+    <input type="password" v-model="clave" placeholder="Contraseña" v-on:keyup.13="login()"><br><br>
     <button type="button" v-on:click="login()">Iniciar sesión</button>
     <button type="button" v-on:click="registro()">Registrarse</button>
  </div>
@@ -16,10 +16,12 @@
         name: 'LoginScreen',
         data(){
             return{
-                variable: null,
+                variable: localStorage.estadoSesion,
                 correo: null,
                 clave: null,
                 token: null,
+                data: null,
+                headers: null,
             };
         },
         /*created: function(){
@@ -29,24 +31,43 @@
         },*/
         methods:{
             login(){
-                const headers = {
+                this.variable = "Iniciando sesión"
+                this.headers = {
                     'Content-Type' : 'application/json',
                     'Authorization' : 'JWT fefege...'
                 }
-                //this.variable = headers;
-                var data = {
+                this.data = {
                     'correo' : this.correo,
                     'clave' : this.clave
                 }
-                axios.post('http://localhost:3000/autenticar', data,{
-                    headers : headers
+                axios.post('http://localhost:3000/autenticar', this.data,{
+                    headers : this.headers
                 })
                 .then(res =>{
-                    this.token = res.data.token;
-                    if(res.data.codigo == 0)
-                        this.$router.push("/home")
-                    else
-                        this.variable="El usuario o contraseña no son correctos"
+                    if(res.data.codigo == 0){
+                        localStorage.tokenSession = res.data.token;
+                        this.headers = {
+                            'acces-token' : localStorage.tokenSession,
+                            'Authorization' : 'JWT fefege...'
+                        }
+                        this.data = {
+                            correo : ""
+                        }
+                        axios.post('http://localhost:3000/infoCliente',this.data,{
+                            headers : this.headers
+                        })
+                        .then(res =>{
+                            if(res.data.codigo != 0){
+                                localStorage.estadoSesion = "";
+                                localStorage.nombreUsuario = res.data.nombre;
+                                localStorage.apellidoUsuario = res.data.apellido;
+                                this.$router.push("/home")
+                            }
+                        })
+                    }else{
+                        localStorage.estadoSesion="El usuario o contraseña no son correctos"
+                        this.variable=localStorage.estadoSesion
+                    }
                 })
             },registro(){
                 this.$router.push("/signup")
@@ -70,4 +91,4 @@
         margin-top: 20px;
         padding: 20px;
     }
-</style>
+</style> 

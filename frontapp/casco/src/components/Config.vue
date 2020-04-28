@@ -34,24 +34,24 @@
                 textoBoton: "Mostrar contraseña",
             };
         },
-		created: function(){
-			const headers = {
+        created: function(){
+            const headers = {
                 'acces-token' : localStorage.tokenSession,
                 'Authorization' : 'JWT fefege...'
             }
             var data = {
-            	correo : ""
+                correo : ""
             }
             axios.post('http://localhost:3000/consultaToken',data,{
                 headers : headers
             })
             .then(res =>{
-            	if(res.data.codigo == 0){
-            		this.$router.push("/")
-      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
-            	}
+                if(res.data.codigo == 0){
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }
             })
-		},
+        },
         /*created: function(){
             axios.post('http://localhost:3000/consulta').then(res =>{
                 this.users = res.data;

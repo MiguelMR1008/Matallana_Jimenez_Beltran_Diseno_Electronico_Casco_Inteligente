@@ -1,5 +1,6 @@
 <template>
-  <div id="app">
+  <div id="map">
+        <Mapa />
     <div id="nav">
       <!--router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link-->
@@ -8,9 +9,9 @@
   </div>
 </template>
 <script>
-import Mapa from './components/Mapa.vue'
+import Mapa from '@/components/Mapa.vue'
 export default {
-  name: 'App',
+  name: 'Map',
   components: {
     Mapa
   }

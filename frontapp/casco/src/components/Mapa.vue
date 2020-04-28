@@ -6,6 +6,7 @@
       <p>Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p>
       <p v-if="!Number.isNaN(Distancia) ">Distancia aproximada:  {{ Distancia }} Km</p>
       <p v-else>Menos de 700m</p>
+      <h1>{{variable2}}</h1>
       <button @click="Miubicacion()">
         Mi ubicacion
       </button>
@@ -53,8 +54,8 @@ import { latLng } from "leaflet";
 import { LMap, LTileLayer, LMarker, LTooltip,LControlScale,LPolygon } from "vue2-leaflet"
 var CoordLat = 4.665918;
 var CoordLong = -74.059916;
-var CascoLat = 4.782904;
-var CascoLong= -74.044923;
+var CascoLat = localStorage.latitudCasco;
+var CascoLong= localStorage.longitudCasco;
 export default {
   name: "Mapa",
   components: {
@@ -67,6 +68,7 @@ export default {
   },
   data() {
     return {
+      variable2: "Inicio Hola",
       zoom: 13,
       center: latLng(CoordLat , CoordLong),
       //CoordCasco: latLng(4.782904,   -74.044923),
@@ -104,15 +106,21 @@ export default {
     innerClick() {
       alert("Esta es la ubicacion actual");
     },
-    centrarMapa: function() {
+    centrarMapa: function(lati, long) {
 
-      CascoLat= CascoLat+0.001;
-      this.center = [CascoLat,CascoLong];
+      //CascoLat= CascoLat+0.001;
+
+      //this.CascoLat=localStorage.latitudCasco
+      //this.CascoLong=localStorage.longitudCasco
+      this.variable2="Entró"
+      this.CascoLat=lati
+      this.CascoLong=long
+      this.center = [this.CascoLat,this.CascoLong];
       this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
-      this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco
+      this.CoordCasco = [this.CascoLat,this.CascoLong];//Actualizo marcador coordenadas casco
       this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Actualizar linea
       //Aproximacion euclidea sin tomar curvatura tierra
-      this.Distancia = Math.sqrt(Math.pow(Math.abs(CoordLat-CascoLat), 2)-Math.pow(Math.abs(CoordLong-CascoLong), 2))*111.1;//Recalculo variable distancia
+      this.Distancia = Math.sqrt(Math.pow(Math.abs(this.CoordLat-this.CascoLat), 2)-Math.pow(Math.abs(CoordLong-this.CascoLong), 2))*111.1;//Recalculo variable distancia
     },
     Miubicacion() {//Ubicacion pariente casco
 

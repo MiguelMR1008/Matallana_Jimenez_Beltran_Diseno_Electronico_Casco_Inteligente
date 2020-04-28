@@ -23,6 +23,7 @@
 
 <script>
 	import axios from 'axios';
+	import Mapa from '@/components/Mapa.vue'
 	export default {
 		name: 'Datos',
 		data(){
@@ -56,7 +57,7 @@
 
             		//this.variable = this.dispositivos.length
             		var i
-            		for( i=0; i < 3; i++){
+            		for( i=0; i < this.dispositivos.length; i++){
             			this.cont=this.cont+1;
             			this.data={
             				IDdisp : this.dispositivos[i]._id
@@ -79,7 +80,11 @@
 		},
 		methods:{
 			verDato: function (lati, long){
+
 				this.variable= " Latitud: " + lati.toString() + " Longitud: " + long.toString()
+				//Mapa.methods.centrarMapa(lati,long);
+				//localStorage.latitudCasco="lati.toString()"
+				//localStorage.longitudCasco=long.toString()
 			}
 		}
 	}

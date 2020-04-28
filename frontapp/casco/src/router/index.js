@@ -3,7 +3,9 @@ import VueRouter from 'vue-router'
 import Inicio from '../views/Inicio.vue'
 import Home from '../views/Home.vue'
 import Registro from '../views/Registro.vue'
-import RegistroData from '../views/RegistroData.vue'
+import Configuracion from '../views/Configuracion.vue'
+import Datos from '../views/Datos.vue'
+import MapaVista from '../views/MapaVista.vue'
 
 Vue.use(VueRouter)
 
@@ -24,9 +26,19 @@ Vue.use(VueRouter)
     component: Registro
   },
   {
-    path: '/regdisp',
-    name: 'RegistroData',
-    component: RegistroData
+    path: '/config',
+    name: 'Configuracion',
+    component: Configuracion
+  },
+  {
+    path: '/data',
+    name: 'Datos',
+    component: Datos
+  },
+  {
+    path: '/map',
+    name: 'MapaVista',
+    component: MapaVista
   },
   {
     path: '/about',

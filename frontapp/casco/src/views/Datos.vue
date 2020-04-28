@@ -6,6 +6,7 @@
     </div>
     <h1>Registros ubicaciones</h1>
     <!--RegistroDispositivo /-->
+    <Mapa />
     <DatosScreen />
     <!--HelloWorld /-->
   </div>
@@ -14,6 +15,7 @@
 <script>
 // @ is an alias to /src
 //import RegistroDispositivo from '@/components/RegistroDispositivo.vue'
+import Mapa from '@/components/Mapa.vue'
 import DatosScreen from '@/components/DatosScreen.vue'
 //import HelloWorld from '@/components/HelloWorld.vue'
 
@@ -21,6 +23,7 @@ export default {
   name: 'RegistrarDisp',
   components: {
     //RegistroDispositivo
+    Mapa,
     DatosScreen
     //HelloWorld
   }
