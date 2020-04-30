@@ -76,7 +76,7 @@
                 if(this.correo=="Miguel"&&this.clave=="Matallana")
                     this.variable = "Hola "+this.correo+" Crack";
                 else
-                    this.variable = this.correo+" es un marrano";
+                    this.variable = this.correo+" w";
             }*/
         }
     }

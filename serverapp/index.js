@@ -18,7 +18,7 @@ jwt = require('jsonwebtoken');
 var router = express.Router();
 
 const llave = 'millavesecreta'
-const jwtExpiritySeconds = 300
+const jwtExpiritySeconds = 1200//Tiempo expiracion token
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

@@ -3,7 +3,7 @@
 	<h1>MENU PRINCIPAL</h1><br>
 
     <h1>Bienvenido {{nombre}} {{apellido}}</h1><br>
-	<button type="button" v-on:click="login()">Ubicación actual</button><br><br>
+	<button type="button" v-on:click="goMapa()">Ubicación actual</button><br><br>
 	<button type="button" v-on:click="goUbicaciones()">Registros ubicación</button><br><br>
 	<button type="button" v-on:click="login()">Estado del dispositivo</button><br><br>
 	<button type="button" v-on:click="goConfig()">Configuración</button><br><br>
@@ -50,6 +50,9 @@
 		},
 		methods:{
 			login(){
+			},
+			goMapa(){
+				this.$router.push("/mapa")
 			},
 			goRegDisp(){
 				this.$router.push("/config")

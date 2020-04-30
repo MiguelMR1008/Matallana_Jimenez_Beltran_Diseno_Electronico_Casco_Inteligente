@@ -36,7 +36,7 @@ Vue.use(VueRouter)
     component: Datos
   },
   {
-    path: '/map',
+    path: '/mapa',
     name: 'MapaVista',
     component: MapaVista
   },

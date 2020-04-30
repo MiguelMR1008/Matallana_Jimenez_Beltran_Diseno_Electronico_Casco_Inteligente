@@ -6,8 +6,9 @@
     </div>
     <h1>Registros ubicaciones</h1>
     <!--RegistroDispositivo /-->
-    <Mapa />
-    <DatosScreen />
+
+    <!--DatosScreen /-->
+        <Mapa/>
     <!--HelloWorld /-->
   </div>
 </template>

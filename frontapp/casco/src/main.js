@@ -6,8 +6,11 @@ import 'leaflet/dist/leaflet.css';
 import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
 import { Icon } from 'leaflet'
 delete Icon.Default.prototype._getIconUrl;
+//Vue.prototype.$bus= new Vue();
+export const bus = new Vue();//Bus de eventos multiples objetos 
+//Vue.prototype.$eventHub = new Vue(); // Global event bus
 
-
+//////Fin bus
 Vue.config.productionTip = false
 
 Icon.Default.imagePath = '.';

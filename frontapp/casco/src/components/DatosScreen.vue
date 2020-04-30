@@ -1,22 +1,33 @@
 <template>
  <div class= "data"><br><br>
+
 	<div>{{variable}}</div>
+ 	<!--Mapa 
+	 :recibirCoordenadas="recibirCoordenadas"
+	  @verregistro="Prueba($event)"
+	/-->
+				
+		
 	<table class="table">
 		<thead>
 			<th scope="col">Dispositivo</th>
 			<th scope="col">Intensidad Golpe</th>
 			<th scope="col">Fecha</th>
 			<th scope="col">Botón</th>
+
 		</thead>
+		<!--buttonbutton v-on:click="verDato(23)" ></button-->
 		<tbody>
 			<tr v-for="dato in datos">
 				<td>{{dato.IDdisp}}</td>
 				<td>{{dato.intensidadGolpe}}</td>
 				<td>{{dato.fechaRegis}}</td>
-				<button type="button" v-on:click="verDato(dato.latitud,dato.longitud)">Ver en el mapa</button><br><br>
+				<button type="button" @click="$emit('enviarcoord',[dato.latitud ,dato.longitud])">Ver en el mapa</button><br><br>
 			</tr>
 		</tbody>
 	</table>
+			
+			<!--button @click="$emit('verregistro','hola')">Pasar dato</button-->
  </div>
 
 </template>
@@ -24,8 +35,14 @@
 <script>
 	import axios from 'axios';
 	import Mapa from '@/components/Mapa.vue'
+	//Variable bus datos
+	import {bus} from "../main";
+
 	export default {
 		name: 'Datos',
+	components: {
+		Mapa
+ 	 },
 		data(){
 			return{
 				dispositivos: null,
@@ -36,7 +53,13 @@
 				data: null,
 				headers: null,
 				cont: 0,
+				//Variables mapa
+
 			};
+		},
+		props: {
+			Regislong: Array,
+			Regislat: Array,
 		},
 		created: function(){
 			this.headers = {
@@ -79,12 +102,17 @@
 			})
 		},
 		methods:{
-			verDato: function (lati, long){
-
-				this.variable= " Latitud: " + lati.toString() + " Longitud: " + long.toString()
+			verDato: function (lati){
+			//verDato: function (lati, long){
+				bus.$emit=('plotRegistro',lati);
+				//this.variable= " Latitud: " + lati.toString() + " Longitud: " + long.toString()
+				//this.$emit('verDato',lati,long);//('metodo',variables)
 				//Mapa.methods.centrarMapa(lati,long);
 				//localStorage.latitudCasco="lati.toString()"
 				//localStorage.longitudCasco=long.toString()
+			},
+			Prueba(dato){
+				alert(dato);
 			}
 		}
 	}
