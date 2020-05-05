@@ -6,7 +6,7 @@ import Registro from '../views/Registro.vue'
 import Configuracion from '../views/Configuracion.vue'
 import Datos from '../views/Datos.vue'
 import MapaVista from '../views/MapaVista.vue'
-
+import Estadodis from '../views/Estadodis.vue'
 Vue.use(VueRouter)
 
   const routes = [
@@ -39,6 +39,11 @@ Vue.use(VueRouter)
     path: '/mapa',
     name: 'MapaVista',
     component: MapaVista
+  },
+  {
+    path: '/estado',
+    name: 'Estadodis',
+    component: Estadodis  
   },
   {
     path: '/about',

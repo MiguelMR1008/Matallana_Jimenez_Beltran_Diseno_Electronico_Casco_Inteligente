@@ -1,11 +1,13 @@
 <template>
   <div class="registroData">
     <div id="nave">
+      
       <div>
       <router-link to="/home">Volver</router-link></div>
     </div>
     <h1>Registro Dispositivo</h1>
     <RegistroDipositivo />
+        <div id="nave">
   </div>
 </template>
 

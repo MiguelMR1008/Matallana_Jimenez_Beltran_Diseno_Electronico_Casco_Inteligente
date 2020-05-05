@@ -3,7 +3,7 @@
 
     
 
-        <Mapa />
+        <Mapa2 />
     <div id="nav">
       <!--router-link to="/">Home</router-link> |
       
@@ -13,11 +13,11 @@
   </div>
 </template>
 <script>
-import Mapa from '@/components/Mapa.vue'
+import Mapa2 from '@/components/Mapa2.vue'
 export default {
   name: 'Map',
   components: {
-    Mapa
+    Mapa2
   }
 }
 </script>

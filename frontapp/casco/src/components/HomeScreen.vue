@@ -5,7 +5,7 @@
     <h1>Bienvenido {{nombre}} {{apellido}}</h1><br>
 	<button type="button" v-on:click="goMapa()">Ubicación actual</button><br><br>
 	<button type="button" v-on:click="goUbicaciones()">Registros ubicación</button><br><br>
-	<button type="button" v-on:click="login()">Estado del dispositivo</button><br><br>
+	<button type="button" v-on:click="goEstado()">Estado del dispositivo</button><br><br>
 	<button type="button" v-on:click="goConfig()">Configuración</button><br><br>
 	<!--button type="button" v-on:click="goRegDisp()">Registrar dispositivo</button><br><br-->
  </div>
@@ -62,6 +62,9 @@
 			},
 			goConfig(){
 				this.$router.push("/config")
+			},
+			goEstado(){
+				his.$router.push("/estado")
 			}
 		},
 	}
