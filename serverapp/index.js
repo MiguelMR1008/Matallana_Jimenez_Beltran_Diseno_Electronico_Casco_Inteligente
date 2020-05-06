@@ -24,7 +24,66 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 //app.use('/', router);
+////////////////INICIO MQTT
+var mqtt = require("mqtt")
 
+var client = mqtt.connect("mqtt://ioticos.org",{
+	clientId : "Casco1",
+	username: "QAU363T02xoXQBk", //Miguel
+	password: "1EBGBSBG22Kip55", //Miguel
+	//username: "NVgHV2YJyAdtZo8", //alvaro
+	///password: "mzeMH901DQRjn9O", //alvaro
+	clean: true
+});
+
+var fabrica_topic = "5stzM7DxxnzJ7JO/fabrica/coord";
+//var contador_topic = "5stzM7DxxnzJ7JO/fabrica/nodecontador";
+
+client.on("connect",function(connack){
+	console.log("Conectado a MQTT")
+	console.log(connack)
+	client.subscribe(fabrica_topic, function(err){
+		if(!err){
+			console.log("subscribed")
+		}
+		});
+});
+client.on("message",function(topic,message){ //Escuchar ioticos
+	console.log("topic")
+	console.log(topic)
+	console.log("mensaje: ")
+	console.log(message)
+	console.log(message.toString());
+	//Enviar el mensaje al frontapp
+	app.post('/mapa', function(req, res){//Enviar a la pestaña mapa
+
+	var payload = {
+		"long" : "4",
+		"lat=" : "74",
+		"bateria": "85.6",
+		"iddispo" : "7468243e",
+		"fecha" :getDateTime()
+	}
+	res.send(payload)
+	/*if(datos==palabra)
+		res.send("Son iguales "+datos)
+	else
+		res.send("Error")*/
+});
+})
+/*
+function intervalFunc(){
+	if(client.connected == true){
+		var op={
+			retain: false,
+			qos: 0
+		};
+		//client.publish(contador_topic, "Test message node",op)
+	}
+}
+setInterval(intervalFunc,1500);
+*/
+////////////Fin MQTT
 //middleware
 router.use(function (req, res, next) {
 	const token = req.headers['acces-token'];

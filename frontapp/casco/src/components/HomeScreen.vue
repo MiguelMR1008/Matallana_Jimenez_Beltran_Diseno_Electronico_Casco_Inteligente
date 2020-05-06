@@ -64,7 +64,7 @@
 				this.$router.push("/config")
 			},
 			goEstado(){
-				his.$router.push("/estado")
+				this.$router.push("/estadodis")
 			}
 		},
 	}

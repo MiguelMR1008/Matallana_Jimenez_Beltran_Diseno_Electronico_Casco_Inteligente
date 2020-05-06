@@ -41,7 +41,7 @@ Vue.use(VueRouter)
     component: MapaVista
   },
   {
-    path: '/estado',
+    path: '/estadodis',
     name: 'Estadodis',
     component: Estadodis  
   },
