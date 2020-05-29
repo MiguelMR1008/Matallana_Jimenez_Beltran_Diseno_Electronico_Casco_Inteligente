@@ -33,6 +33,11 @@ HTTP.listen(3001,()=>{
 	console.log("Socket io escuchando")
 });
 var arreglo = []
+var contador = 0;
+var lati=4.691918;
+var longi=-74.062958;
+var fech = getDateTime();
+////////variables socketio
 io.on('connection',(socket)=>{
 	console.log("Nuevo cliente")
 	socket.emit('msg','hola desde node'+getDateTime())
@@ -60,21 +65,20 @@ var mqtt = require("mqtt")
 
 var client = mqtt.connect("mqtt://ioticos.org",{
 	clientId : "Casco1",
-	//username: "QAU363T02xoXQBk", //Miguel
-	//password: "1EBGBSBG22Kip55", //Miguel
-	username: "NVgHV2YJyAdtZo8", //alvaro
-	password: "mzeMH901DQRjn9O", //alvaro
+	username: "QAU363T02xoXQBk", //Miguel
+	password: "1EBGBSBG22Kip55", //Miguel
+	//username: "NVgHV2YJyAdtZo8", //alvaro
+	///password: "mzeMH901DQRjn9O", //alvaro
 	clean: true
 });
 
-//var fabrica_topic = "5stzM7DxxnzJ7JO/fabrica/coord";
-var datos_topic = "5stzM7DxxnzJ7JO/cascoInteligente/datos"
+var fabrica_topic = "5stzM7DxxnzJ7JO/fabrica/coord";
 //var contador_topic = "5stzM7DxxnzJ7JO/fabrica/nodecontador";
 
 client.on("connect",function(connack){
 	console.log("Conectado a MQTT")
 	console.log(connack)
-	client.subscribe(datos_topic, function(err){
+	client.subscribe(fabrica_topic, function(err){
 		if(!err){
 			console.log("subscribed")
 		}
@@ -87,12 +91,14 @@ client.on("message",function(topic,message){ //Escuchar ioticos
 	console.log(message)
 	console.log(message.toString());
 	//Enviar el mensaje al frontapp
-//	app.post('/mapa', function(req, res){//Enviar a la pestaña mapa
+	app.post('/mapa', function(req, res){//Enviar a la pestaña mapa
+
+
 	/*if(datos==palabra)
 		res.send("Son iguales "+datos)
 	else
 		res.send("Error")*/
-//});
+});
 })
 
 function intervalFunc(){
@@ -118,11 +124,16 @@ var contador = 0;
 var lati=4.691918;
 var longi=-74.062958;
 var fech = getDateTime();
+
 function envio_sio(){
 //	if(flag==1){
 			//JSON.stringify(cascopayload) para enviarlo asi
-			io.emit('msg2','cuenta: '+ contador++ );
-			
+			io.emit('msg2','cuenta: '+ contador++ +JSON.stringify(cascopayload) );
+			contador++;
+			if(contador>=5){
+				io.emit('alarma',1);
+				contador=0;
+			}
 			if(lati>5.1){
 				lati=4.5
 			}
@@ -193,8 +204,8 @@ app.post('/registroUsuario',function (req, res){
 						"clave" : crypto.createHash('md5').update(req.body.clave).digest("hex"),
 						"telefono" : req.body.telefono,
 						"fechaRegis" : getDateTime(),
-						"telAsociado" : req.body.telefono2,
-						"rol" : req.body.rol
+						"rol" : req.body.rol,
+						"streaming" : req.body.streaming
 					};
 					myData= new regisUsuario(datos)
 					insertarBD(myData)
@@ -244,6 +255,7 @@ app.post('/autenticar', (req, res) =>{
 				res.json({
 					mensaje : 'Autenticación correcta',
 					token : token,
+					rol : result.rol,
 					codigo : 0
 				});
 			}else{
@@ -274,8 +286,8 @@ app.post('/cambiarClave', router, function(req, res){
 				"clave": crypto.createHash('md5').update(datos.nuevaClave).digest("hex"),
 				"telefono": result.telefono,
 				"fechaRegis": result.fechaRegis,
-				"telAsociado": result.telAsociado,
 				"rol": result.rol,
+				"streaming": result.streaming,
 			})
 			res.send({
 				mensaje: "Clave modificada exitosamente",
@@ -485,14 +497,203 @@ app.post('/registroDispositivo',router, function (req, res){
 					};
 					myData= new regis(datos)
 					insertarBD(myData)
+
+					regis = mongoose.model("Usuarios", esquemaUsuario);
+					var query = {
+					 	correo: req.decoded.correo
+					}
+					regis.findOne(query, function(err, result){
+						if(err){
+							console.log("Error en la consulta")
+						}else{
+							console.log("Consulta OK")
+							if(result){
+								if(result.rol == 3){
+									regis.collection.update(query,
+									{
+										"_id": result._id,
+										"correo": result.correo,
+										"clave": result.clave,
+										"telefono": result.telefono,
+										"fechaRegis": result.fechaRegis,
+										"rol": 2,
+										"streaming": result.streaming,
+									})
+									res.json({ 
+										mensaje : "Registro exitoso y ahora es usuario tipo 2",
+										codigo : 0
+									})
+								}else{
+									res.json({ 
+										mensaje : "Registro exitoso",
+										codigo : 0
+									})
+								}
+							}
+						}
+					})
+
+
+					
+				}
+			}
+		})
+	}
+});
+
+app.post('/registroAsociado',router, function (req, res){
+	regis = mongoose.model("Asociado", esquemaAsociado); 
+	console.log(req.body)
+	var datos
+	var myData
+	var query = {
+		$and:[
+		{ telAsociado: req.body.telAsociado},
+		{ correoUsuario : req.decoded.correo}
+		]
+	}
+	if((req.body.telAsociado != "" && req.body.telAsociado != null)){
+		regis.findOne(query, function(err, result){
+			if(err){
+				console.log("Error en la consulta")
+				res.send("Error")
+			}else{
+				console.log("Consulta OK")
+				if(result){
 					res.json({ 
-						mensaje : "Registro exitoso",
+						mensaje : "El número de teléfono ingresado ya existe",
+						codigo : 1
+					})
+				}else{
+					datos = {
+						"nombreAsociado" : req.body.nombreAsociado,
+						"telAsociado" : req.body.telAsociado,
+						"correoUsuario" : req.decoded.correo
+					};
+					myData= new regis(datos)
+					insertarBD(myData)
+					res.json({ 
+						mensaje : "Registro de asociado exitoso",
 						codigo : 0
 					})
 				}
 			}
 		})
 	}
+});
+
+app.post('/streaming', router, function(req, res){
+	regis = mongoose.model("Usuarios", esquemaUsuario);
+	var query = {
+		correo: req.decoded.correo
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				
+				if(req.body.streaming==0){
+					regis.collection.update(query,
+					{
+						"_id": result._id,
+						"correo": result.correo,
+						"clave": result.clave,
+						"telefono": result.telefono,
+						"fechaRegis": result.fechaRegis,
+						"rol": result.rol,
+						"streaming": 0,
+					})
+					res.json({ 
+					mensaje : "Streaming desactivado",
+					codigo : 0
+				})
+				}else{
+					regis.collection.update(query,
+					{
+						"_id": result._id,
+						"correo": result.correo,
+						"clave": result.clave,
+						"telefono": result.telefono,
+						"fechaRegis": result.fechaRegis,
+						"rol": result.rol,
+						"streaming": 1,
+					})
+					res.json({ 
+						mensaje : "Streaming activado",
+						codigo : 0
+					})
+				}
+								
+			}
+		}
+	})
+});
+
+app.post('/verStreaming', router, function(req, res){
+	regis = mongoose.model("Asociado", esquemaAsociado);
+	var stream
+	var nombreUser
+	var apellidoUser
+	var query = {
+		telAsociado: req.body.telefono
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				regis = mongoose.model("Usuarios", esquemaUsuario);
+				var query = {
+				 	correo: result.correoUsuario
+				}
+				regis.findOne(query, function(err, result){
+					if(err){
+						console.log("Error en la consulta")
+					}else{
+						console.log("Consulta OK")
+						if(result){
+							stream=result.streaming
+							regis = mongoose.model("Cliente", esquemaCliente);
+							query = { correo : result.correo}
+							regis.findOne(query, function(err, result){
+								if(err){
+									console.log("Error en la consulta")
+									res.send("Error")
+								}else{
+									console.log(result)
+									nombreUser=result.nombre
+									apellidoUser=result.apellido
+									if(stream==1){
+										res.json({ 
+											mensaje : "Es asociado y el streaming está activado",
+											nombreUsuario : nombreUser,
+											apellidoUsuario : apellidoUser,
+											codigo : 1
+										})
+									}else{
+										res.json({ 
+											mensaje : "Es asociado y el streaming está desactivado",
+											nombreUsuario : nombreUser,
+											apellidoUsuario : apellidoUser,
+											codigo : 2
+										})
+									}
+								}
+							})
+						}
+					}
+				})			
+			}else{
+				res.json({ 
+					mensaje : "Usted no está vinculado a ningún usuario",
+					codigo : 3
+				})
+			}
+		}
+	})
 });
 
 app.post('/registroDato', function(req, res){
@@ -511,21 +712,6 @@ app.post('/registroDato', function(req, res){
 		mensaje : "Registro exitoso",
 		codigo : 0
 	})
-});
-
-app.post('/ubicacionActual', function(req, res){
-	var datos = req.body.nombre
-	var palabra = "Miguel"
-	//datos=crypto.createHash('md5').update(datos).digest("hex");
-	palabra=crypto.createHash('md5').update(palabra).digest("hex");
-	var payload = {
-		"mensaje" : crypto.createHash('md5').update(datos).digest("hex")
-	}
-	res.send(payload)
-	/*if(datos==palabra)
-		res.send("Son iguales "+datos)
-	else
-		res.send("Error")*/
 });
 
 app.post('/pruebaCrypto', function(req, res){
@@ -596,7 +782,8 @@ var esquemaUsuario=new mongoose.Schema({
 		telefono: String,
 		fechaRegis: String,
 		telAsociado: String,
-		rol: Number
+		rol: Number,
+		streaming: Number
 });
 
 var esquemaCliente=new mongoose.Schema({
@@ -604,6 +791,12 @@ var esquemaCliente=new mongoose.Schema({
 		apellido: String,
 		correo: String,
 		telefono: String
+});
+
+var esquemaAsociado=new mongoose.Schema({
+		nombreAsociado: String,
+		telAsociado: String,
+		correoUsuario: String
 });
 
 var esquemaDispositivo=new mongoose.Schema({

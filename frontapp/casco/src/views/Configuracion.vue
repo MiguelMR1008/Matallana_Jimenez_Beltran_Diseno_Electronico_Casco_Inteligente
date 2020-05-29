@@ -10,6 +10,7 @@
     <h1>Configuración</h1>
     <Config />
     <RegistroDispositivo />
+    <RegistroAsociado />
     <div>
       <h2>Tipo de usuario: </h2>
       <h2 v-if="tipousuario==1"> Administrador</h2>
@@ -52,17 +53,19 @@
 <script>
 // @ is an alias to /src
 import RegistroDispositivo from '@/components/RegistroDispositivo.vue'
+import RegistroAsociado from '@/components/RegistroAsociado.vue'
 import Config from '@/components/Config.vue'
 
 export default {
   name: 'Configuracion',
   components: {
     RegistroDispositivo,
-    Config
+    Config,
+    RegistroAsociado
   },data(){
     return {
       streaming: 1, //1, activado, 2 desactivado
-      tipousuario:3, //3= Usuario normal(asociado),2=Dueño casco, 1=Admin
+      tipousuario:localStorage.rolSession, //3= Usuario normal(asociado),2=Dueño casco, 1=Admin
       modificar:1
       }
     },

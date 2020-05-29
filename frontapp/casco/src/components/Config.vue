@@ -122,7 +122,7 @@
     #configScreen {
         width: 500px;
         border: 1px solid #CCCCCC;
-        background-color: #FFFFFF;
+        background-color: #008080;
         margin: auto;
         margin-top: 5px;
         padding: 20px;

@@ -46,6 +46,7 @@
                 .then(res =>{
                     if(res.data.codigo == 0){
                         localStorage.tokenSession = res.data.token;
+                        localStorage.rolSession = res.data.rol;
                         this.headers = {
                             'acces-token' : localStorage.tokenSession,
                             'Authorization' : 'JWT fefege...'
@@ -61,6 +62,7 @@
                                 localStorage.estadoSesion = "";
                                 localStorage.nombreUsuario = res.data.nombre;
                                 localStorage.apellidoUsuario = res.data.apellido;
+                                localStorage.telefono = res.data.telefono;
                                 this.$router.push("/home")
                             }
                         })

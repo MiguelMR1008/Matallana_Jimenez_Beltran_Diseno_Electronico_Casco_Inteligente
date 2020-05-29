@@ -24,6 +24,7 @@
       <!--button @click="$emit('enviarcoord','hola')">Pasar dato</button-->
     </div>
     <l-map
+    v-if="streaming==1"
       :zoom="zoom"
       :center="center"
       :options="mapOptions"
@@ -83,6 +84,7 @@ export default {
       estado:1,
       streaming:1,
       socket:{}, //Para manejar socketio
+      alerta:0,
       contador: "",
       CoordLat: 4.665918, //Coordenadas iniciales por si falla la autoubicacion
       CoordLong: 4.665918,
@@ -92,7 +94,7 @@ export default {
       //CoordCasco: latLng(4.782904,   -74.044923),
       caslatsum:CascoLat,
       caslongsum:CascoLong,
-      fecha:'18/05/20 15:20',
+      fecha:'29/05/20 09:00',
       milatsum:CoordLat,
       milongsum:CoordLong,
       CoordCasco: latLng(CascoLat,CascoLong),
@@ -186,16 +188,18 @@ export default {
     }
 
   },//FIn metodos
-  created(){
-    this.socket = io("localhost:3001");
+  //created(){
     //Llenar coordenadas con posicion actual navegador
        // if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(this.getPosition);
-          console.log('hola')
+          //navigator.geolocation.getCurrentPosition(this.getPosition);
+          
         //}
-
-  },
+  //},
         created: function(){ //Negar si no tiene el token
+//          var socket = io.connect('http://localhost');
+          this.socket = io.connect("http://localhost:3001");
+          //var socket = io.connect('http://localhost:3001');
+          console.log('hola')
             const headers = {
                 'acces-token' : localStorage.tokenSession,
                 'Authorization' : 'JWT fefege...'
@@ -214,8 +218,20 @@ export default {
             })
         },
   mounted(){
+    if(this.alerta==1){
+      alert("Acaba de ocurrir un accidente, favor dirigirse hacia el historial");
+      this.alerta=0;
+    }
+    //var socket = io.connect('http://localhost:3001');
+var socket = io.connect('localhost:3001');
+      socket.on("msg",data=>{ 
+      console.log('holajson')
+      console.log(data)
+
+    })
+     
     this.socket.on("msg2",data=>{
-               console.log('holajson')
+      console.log('holajson')
       console.log(data)
       //Actualizar ubicacion casco
     })
@@ -229,11 +245,16 @@ export default {
       this.center = [CascoLat,CascoLong]; //Primero long, luego lat
       //Actualizar ubicacion casco
     })    
+
     this.socket.on("fechita",data=>{
       this.fecha=data;
       console.log(data)
      // fecha=data;
     })
+    this.socket.on("alarma",data=>{
+      this.alerta=data;
+    })
+
   } //Fin mounted
 
 }; //Fin export default

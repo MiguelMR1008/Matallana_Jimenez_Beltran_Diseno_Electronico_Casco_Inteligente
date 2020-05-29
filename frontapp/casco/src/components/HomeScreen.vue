@@ -4,7 +4,7 @@
 	<h1>MENU PRINCIPAL</h1><br>
 
     <h1>Bienvenido {{nombre}} {{apellido}}</h1><br>
-    
+    <h1>Rol {{rol}} Telefono {{telefono}}</h1><br>
 	<button type="button" class="btn btn-primary" v-on:click="goMapa()">Ubicación actual</button><br><br>
 	<button type="button" class="btn btn-info" v-on:click="goUbicaciones()">Registros ubicación</button><br><br>
 	<button type="button" class="btn btn-info" v-on:click="goEstado()">Estado del dispositivo</button><br><br>
@@ -22,6 +22,8 @@
 			return{
 				nombre: localStorage.nombreUsuario,
 				apellido: localStorage.apellidoUsuario,
+				telefono: localStorage.telefono,
+				rol: localStorage.rolSession,
 				registros: null,
 				variable: null,
 				IDdisp: null,

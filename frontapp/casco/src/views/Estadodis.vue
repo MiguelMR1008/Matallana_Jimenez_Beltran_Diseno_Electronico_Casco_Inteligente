@@ -24,7 +24,7 @@
 				<img alt="Logo" src="../assets/batfull.png" width="30" height="30">
 				</td>	
 
-				<td>20/05/20 17:29 (Hace 5 minutos)</td>		
+				<td>20/05/20 17:29</td>		
 			</tr>
 			<tr >
 				<td>fdsj932982j982f39</td>
