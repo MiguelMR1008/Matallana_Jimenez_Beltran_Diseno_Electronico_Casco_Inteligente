@@ -15,17 +15,28 @@ var mqtt = require("mqtt")
 
 var client = mqtt.connect("mqtt://ioticos.org",{
 	clientId : "Casco",
+	//Miguel
+	//username: "NVgHV2YJyAdtZo8",
+	//password: "mzeMH901DQRjn9O",
 	username: "NVgHV2YJyAdtZo8",
 	password: "mzeMH901DQRjn9O",
 	clean: true
 });
-
+//Miguel
+//var fabrica_topic = "5stzM7DxxnzJ7JO/fabrica/#";
+//var contador_topic = "5stzM7DxxnzJ7JO/fabrica/nodecontador";
+//Alvaro
 var fabrica_topic = "5stzM7DxxnzJ7JO/fabrica/#";
 var contador_topic = "5stzM7DxxnzJ7JO/fabrica/nodecontador";
-
 client.on("connect",function(connack){
 	console.log("Conectado a MQTT")
 	console.log(connack)
+	///datos
+	client.subscribe(datos, function(err){
+		if(!err){
+			console.log("subscribed")
+		}
+		});	
 	client.subscribe(fabrica_topic, function(err){
 		if(!err){
 			console.log("subscribed")

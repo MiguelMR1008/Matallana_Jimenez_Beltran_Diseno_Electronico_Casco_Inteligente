@@ -14,8 +14,8 @@
     <input type="text" v-model="correo"><br>
     <div>Contraseña</div>
     <input type="password" v-model="clave"><br>
-    <div>Número de teléfono asociado</div>
-    <input type="text" v-model="telefono2"><br><br>
+    <!--div>Número de teléfono asociado</div>
+    <input type="text" v-model="telefono2"><br><br-->
     <button type="button" v-on:click="signup()">Registrarse</button>
  </div>
 

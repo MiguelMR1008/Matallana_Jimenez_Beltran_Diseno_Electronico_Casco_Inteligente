@@ -195,7 +195,7 @@ export default {
         //}
 
   },
-              created: function(){ //Negar si no tiene el token
+        created: function(){ //Negar si no tiene el token
             const headers = {
                 'acces-token' : localStorage.tokenSession,
                 'Authorization' : 'JWT fefege...'
@@ -215,11 +215,13 @@ export default {
         },
   mounted(){
     this.socket.on("msg2",data=>{
+               console.log('holajson')
       console.log(data)
       //Actualizar ubicacion casco
     })
    this.socket.on("sendlat",data=>{
       console.log(data)
+      console.log('holalatitud')
       CascoLat=data;
       this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
       this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco

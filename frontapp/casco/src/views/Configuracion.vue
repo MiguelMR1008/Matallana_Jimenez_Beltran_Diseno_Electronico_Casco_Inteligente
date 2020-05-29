@@ -11,7 +11,10 @@
     <Config />
     <RegistroDispositivo />
     <div>
-      <h2>Tipo de usuario: Dueño casco</h2>
+      <h2>Tipo de usuario: </h2>
+      <h2 v-if="tipousuario==1"> Administrador</h2>
+      <h2 v-if="tipousuario==2"> Dueño casco</h2>
+      <h2 v-if="tipousuario==3"> Usuario normal (Asociado)</h2>
       <h5>Dispositivos asociados: Casco1 </h5>
       <h5>Allegados: Enrique, Jose, Vladimir </h5>
       <h5>Opciones:   </h5>
@@ -21,22 +24,26 @@
       <option value="2">Jose</option> 
       <option value="3">Vladimir</option> 
       </select>&nbsp;    
-      <button type="button" class="btn btn-info &emsp">Modificar </button > &nbsp;
-      <button type="button" class="btn btn-danger">Eliminar</button>
+      <button type="button" class="btn btn-info &emsp" v-on:click="asignarModificar()">Modificar </button > &nbsp;<br>
+      <input v-if="modificar==1" type="text"><br><br>
+       <button v-if="modificar==1" type="button" class="btn btn-primary">Cambiar nombre</button>
+      <button type="button" class="btn btn-danger" v-on:click="eliminarAsociado()">Eliminar</button>
       <form action="/action_page.php"><br>
   <label for="fname">Nombre nuevo allegado:</label>
   <input type="text" id="fname" name="fname"><br><br>
-  <label for="lname">Correo usuario allegado:</label>
-  <input type="text" id="lname" name="lname"><br><br>
+  <label for="lname">Telefono usuario allegado:</label>
+  <input type="number" id="lname" name="lname"><br><br>
   <button type="button" class="btn btn-primary">Guardar cambios</button>
 </form>
       <h5>Activar streaming:   </h5>
-      <select name="streaming">
-      <option value="1">Activado</option> 
-      <option value="2">Desactivado</option> 
+      <h5 v-if="streaming==1">Streaming activado</h5>
+      <h5 v-if="streaming==0">Streaming desactivado</h5>
+      <select id="valoresStream">
+      <option value=1> Activado </option> 
+      <option value=0>Desactivado</option> 
       </select>
     </br> </br>
-      <button type="button" class="btn btn-primary">Guardar cambios</button>
+      <button type="button" class="btn btn-primary" v-on:click="asignarStream()">Guardar cambios</button>
     </div>
 
   </div>
@@ -52,8 +59,26 @@ export default {
   components: {
     RegistroDispositivo,
     Config
-  }
+  },data(){
+    return {
+      streaming: 1, //1, activado, 2 desactivado
+      tipousuario:3, //3= Usuario normal(asociado),2=Dueño casco, 1=Admin
+      modificar:1
+      }
+    },
+    methods:{
+        asignarStream(){
+            this.streaming=document.getElementById("valoresStream").value;
+        },
+        asignarModificar(){
+            this.modificar = !this.modificar;
+        },
+        eliminarAsociado(){
+          //Funcion eliminar asociado
+        }
+    }
 }
+
 </script>
 
 <style>
