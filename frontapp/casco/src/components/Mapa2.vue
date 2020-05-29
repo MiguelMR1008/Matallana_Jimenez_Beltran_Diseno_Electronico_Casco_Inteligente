@@ -10,10 +10,14 @@
 
       <h2 v-if="Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
     <h2 v-else> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
-
-      <h2>Último registro: 20/04/20 15:30 (Hace 5 minutos)</h2>
-      <button type="button" class="btn btn-success">Estado: Encendido</button></br></br>
-          <button type="button" class="btn btn-success">Streaming: Encendido</button></br></br>
+  <h2>Último registro: {{fecha}} </h2>
+      <!--h2>Último registro: 20/04/20 15:30 (Hace 5 minutos)</h2-->
+      <button v-if="estado==1" type="button" class="btn btn-success">Estado: Encendido</button>
+      <button v-else type="button" class="btn btn-danger">Estado: Apagado</button>
+    </br></br>
+      <button v-if="streaming==1"type="button" class="btn btn-success">Streaming: Encendido</button>
+      <button v-else type="button" class="btn btn-danger">Streaming: Apagado</button>
+    </br></br>
       <button @click="Miubicacion()">
         Mi ubicacion
       </button>
@@ -57,6 +61,8 @@
 <script>
 import { latLng } from "leaflet";
 import { LMap, LTileLayer, LMarker, LTooltip,LControlScale,LPolygon } from "vue2-leaflet"
+import axios from 'axios';//axios para el token
+import io from 'socket.io-client'
 var CoordLat = 4.665918; //Coordenadas iniciales por si falla la autoubicacion
 var CoordLong = -74.059916;
 var CascoLat =  4.691918;
@@ -74,16 +80,24 @@ export default {
   data() {
     return {
       variable2: "Inicio Hola",
+      estado:1,
+      streaming:1,
+      socket:{}, //Para manejar socketio
+      contador: "",
+      CoordLat: 4.665918, //Coordenadas iniciales por si falla la autoubicacion
+      CoordLong: 4.665918,
+      mensaje: "",
       zoom: 13,
       center: latLng(CoordLat , CoordLong),
       //CoordCasco: latLng(4.782904,   -74.044923),
       caslatsum:CascoLat,
       caslongsum:CascoLong,
+      fecha:'18/05/20 15:20',
       milatsum:CoordLat,
       milongsum:CoordLong,
       CoordCasco: latLng(CascoLat,CascoLong),
       MisCoordenadas: latLng(CoordLat, CoordLong),
-      //Distancia : Math.sqrt(Math.pow(Math.abs(CoordLat-CascoLat), 2)-Math.pow(Math.abs(CoordLong-//CascoLong), 2))*111.1,
+      Distancia : Math.sqrt(Math.pow(Math.abs(CoordLat-CascoLat), 2)-Math.pow(Math.abs(CoordLong-CascoLong), 2))*111.1,
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -100,13 +114,17 @@ export default {
       },
       showMap: true
     };
-  },
+  }, //FIn data
   props: {    //Una prueba a ver si sirve
       recibirCoordenadas: "",
       prueba:"No"
   },
 
   methods: {
+        getPosition(position) {
+          this.CoordLat = position.coords.latitude;
+          this.CoordLong = position.coords.longitude;          
+        },
     zoomUpdate(zoom) {
       this.currentZoom = zoom;
     },
@@ -133,7 +151,7 @@ export default {
     },
     Miubicacion() {//Ubicacion pariente casco
 
-
+      //  navigator.geolocation.getCurrentPosition(this.getPosition());
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(getPosition);
         }
@@ -169,13 +187,60 @@ export default {
 
   },//FIn metodos
   created(){
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(getPosition);
-        }
-        function getPosition(position) {
-          this.CoordLat = position.coords.latitude;
-          this.CoordLong = position.coords.longitude;          
-        }
-  }
-};
+    this.socket = io("localhost:3001");
+    //Llenar coordenadas con posicion actual navegador
+       // if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(this.getPosition);
+          console.log('hola')
+        //}
+
+  },
+              created: function(){ //Negar si no tiene el token
+            const headers = {
+                'acces-token' : localStorage.tokenSession,
+                'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+                correo : ""
+            }
+            axios.post('http://localhost:3000/consultaToken',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }
+            })
+        },
+  mounted(){
+    this.socket.on("msg2",data=>{
+      console.log(data)
+      //Actualizar ubicacion casco
+    })
+   this.socket.on("sendlat",data=>{
+      console.log(data)
+      CascoLat=data;
+      this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
+      this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco
+      this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Por algun motivo se invirtieron
+      this.center = [CascoLat,CascoLong]; //Primero long, luego lat
+      //Actualizar ubicacion casco
+    })    
+    this.socket.on("fechita",data=>{
+      this.fecha=data;
+      console.log(data)
+     // fecha=data;
+    })
+  } //Fin mounted
+
+}; //Fin export default
 </script>
+<style>
+  h2 {
+    color:white;
+  }
+  p {
+    color:white;
+  }  
+</style>

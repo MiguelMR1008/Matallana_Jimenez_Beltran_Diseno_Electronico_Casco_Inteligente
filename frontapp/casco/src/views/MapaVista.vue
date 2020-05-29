@@ -2,11 +2,12 @@
   <div id="map">
 
     
-
+     <div>
+      <router-link to="/home"><button class="btn btn-secondary">Volver</button></router-link>
+    </div>
         <Mapa2 />
     <div id="nav">
-      <!--router-link to="/">Home</router-link> |
-      
+      <!--router-link to="/">Home</router-link> |      
       <router-link to="/about">About</router-link-->
     </div>
     <router-view/>

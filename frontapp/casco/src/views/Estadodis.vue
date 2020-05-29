@@ -1,8 +1,12 @@
 <template>
 
   <div class="estadodisp">
+     <div>
+      <router-link to="/home"><button class="btn btn-secondary">Volver</button></router-link>
+    </div>
   	<h1>Estado dispositivos</h1>
-    	<table class="table">
+
+    	<table class="table table-dark">
 		<thead>
 			<th scope="col">Dispositivo</th>
 			<th scope="col">Dueño dispositivo</th>
@@ -50,11 +54,44 @@
 <script>
 // @ is an alias to /src
 //import Estado from '@/components/Estado.vue'
-
+import axios from 'axios';//axios para el token
 export default {
   name: 'Estadodis',
   components: {
   	//Estado
-  }
+  },
+          created: function(){ //Negar si no tiene el token
+            const headers = {
+                'acces-token' : localStorage.tokenSession,
+                'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+                correo : ""
+            }
+            axios.post('http://localhost:3000/consultaToken',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }
+            })
+        },
 }
+
 </script>
+<style>
+    #nave {
+      padding: 30px;
+    }
+
+    #nave a {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    #nave a.router-link-exact-active {
+      color: #42b983;
+    }
+</style>

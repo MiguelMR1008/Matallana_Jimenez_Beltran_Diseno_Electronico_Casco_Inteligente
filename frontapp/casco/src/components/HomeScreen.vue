@@ -1,12 +1,14 @@
 <template>
- <div id= "homeScreen">
+ <div id= "homeScreen" >
+ 	<button type="button" class="btn btn-secondary" v-on:click="goDeslog() ">Cerrar sesion</button><br><br>
 	<h1>MENU PRINCIPAL</h1><br>
 
     <h1>Bienvenido {{nombre}} {{apellido}}</h1><br>
-	<button type="button" v-on:click="goMapa()">Ubicación actual</button><br><br>
-	<button type="button" v-on:click="goUbicaciones()">Registros ubicación</button><br><br>
-	<button type="button" v-on:click="goEstado()">Estado del dispositivo</button><br><br>
-	<button type="button" v-on:click="goConfig()">Configuración</button><br><br>
+    
+	<button type="button" class="btn btn-primary" v-on:click="goMapa()">Ubicación actual</button><br><br>
+	<button type="button" class="btn btn-info" v-on:click="goUbicaciones()">Registros ubicación</button><br><br>
+	<button type="button" class="btn btn-info" v-on:click="goEstado()">Estado del dispositivo</button><br><br>
+	<button type="button" class="btn btn-info" v-on:click="goConfig()">Configuración</button><br><br>
 	<!--button type="button" v-on:click="goRegDisp()">Registrar dispositivo</button><br><br-->
  </div>
 
@@ -65,13 +67,28 @@
 			},
 			goEstado(){
 				this.$router.push("/estadodis")
+			},
+			goDeslog(){ //Provisional cerrar sesion
+				localStorage.tokenSession="";//Borro el token
+				this.$router.push("/")
+
 			}
 		},
 	}
 </script>
 
 <style>
+	h1 {
+  color: white;
+	}
+
 	h3 {
 		margin-bottom: 5%;
 	}
+body { 
+  background-image: url('../assets/Fondo.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
 </style> 

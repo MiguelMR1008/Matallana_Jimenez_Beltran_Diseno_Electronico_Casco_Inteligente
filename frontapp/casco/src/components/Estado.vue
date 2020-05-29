@@ -5,7 +5,8 @@
  	<!--Mapa 
 	 :recibirCoordenadas="recibirCoordenadas"
 	  @verregistro="Prueba($event)"
-	/-->						
+	/-->	
+	  <router-link to="/home">Volver</router-link></div>					
 	<table class="table">
 		<thead>
 			<th scope="col">Dispositivo</th>

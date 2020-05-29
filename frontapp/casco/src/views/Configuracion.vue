@@ -2,7 +2,10 @@
   <div class="config">
     <div id="nave">
       <div>
-      <router-link to="/home">Volver</router-link></div>
+        <div>
+      <router-link to="/home"><button class="btn btn-secondary">Volver</button></router-link>
+    </div>
+    </div>
     </div>
     <h1>Configuración</h1>
     <Config />
@@ -54,6 +57,12 @@ export default {
 </script>
 
 <style>
+    h5 {
+    color:white;
+  }
+    label {
+    color:white;
+  }
     #nave {
       padding: 30px;
     }

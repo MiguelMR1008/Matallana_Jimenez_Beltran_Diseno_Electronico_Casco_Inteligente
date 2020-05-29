@@ -8,8 +8,8 @@
 	/-->
 				
 		
-	<table class="table">
-		<thead>
+	<table class="table table-dark">
+		<thead class="thead-dark">
 			<th scope="col">Dispositivo</th>
 			<th scope="col">Intensidad Golpe</th>
 			<th scope="col">Fecha</th>
@@ -22,7 +22,7 @@
 				<td>{{dato.IDdisp}}</td>
 				<td>{{dato.intensidadGolpe}}</td>
 				<td>{{dato.fechaRegis}}</td>
-				<button type="button" @click="$emit('enviarcoord',[dato.latitud ,dato.longitud])">Ver en el mapa</button><br><br>
+				<button class="btn btn-primary" type="button" @click="$emit('enviarcoord',[dato.latitud ,dato.longitud])">Ver en el mapa</button><br><br>
 			</tr>
 		</tbody>
 	</table>

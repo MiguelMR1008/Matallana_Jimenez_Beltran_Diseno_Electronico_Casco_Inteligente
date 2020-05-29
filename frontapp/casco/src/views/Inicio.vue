@@ -1,6 +1,9 @@
 <template>
   <div class="inicio">
+  	<img src="@/assets/Slogan.png">
+  	<br>
     <img alt="Logo" src="../assets/Imagen1.png">
+
     <Login />
   </div>
 </template>

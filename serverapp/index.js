@@ -7,6 +7,10 @@ var express = require("express"),
 var cors = require('cors')
 var https = require('https');
 var http = require('http');
+//Escuchar puerto distinto webservices para socket io
+var HTTP = require('http').Server(express)
+
+var io = require('socket.io')(HTTP) //libreria http server express
 
 var mongoose = require('mongoose');
 crypto = require('crypto');
@@ -24,6 +28,33 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 //app.use('/', router);
+///Inicio socket io
+HTTP.listen(3001,()=>{
+	console.log("Socket io escuchando")
+});
+var arreglo = []
+io.on('connection',(socket)=>{
+	console.log("Nuevo cliente")
+	socket.emit('msg','hola desde node'+getDateTime())
+	arreglo.push(socket);
+
+	socket.on('incremento',(counter)=>{
+		console.log('Msg from socket io incremento'+counter)
+
+	})
+	socket.on('decremento',(counter)=>{
+		console.log('Msg from socket io decremento'+counter)
+	})
+
+	socket.on('disconnect',(reason)=>{
+		var i = arreglo.indexOf(socket)
+		if(i != -1){
+			console.log('Socket desconectado')
+			arreglo.splice(i,1)
+		}
+	})
+})
+
 ////////////////INICIO MQTT
 var mqtt = require("mqtt")
 
@@ -57,36 +88,62 @@ client.on("message",function(topic,message){ //Escuchar ioticos
 	//Enviar el mensaje al frontapp
 	app.post('/mapa', function(req, res){//Enviar a la pestaña mapa
 
-	var payload = {
-		"long" : "4",
-		"lat=" : "74",
-		"bateria": "85.6",
-		"iddispo" : "7468243e",
-		"fecha" :getDateTime()
-	}
-	res.send(payload)
+
 	/*if(datos==palabra)
 		res.send("Son iguales "+datos)
 	else
 		res.send("Error")*/
 });
 })
-/*
+
 function intervalFunc(){
+	/*
 	if(client.connected == true){
 		var op={
 			retain: false,
 			qos: 0
 		};
-		//client.publish(contador_topic, "Test message node",op)
+		client.publish(contador_topic, "Test message node",op)
 	}
+	*/
 }
-setInterval(intervalFunc,1500);
-*/
+	var cascopayload = {
+		"long" : "4",
+		"lat=" : "74",
+		"bateria": "85.6",
+		"iddispo" : "7468243e",
+		"fecha" :getDateTime()
+	}
+	//res.send(cascopayload)
+var contador = 0;
+var lati=4.691918;
+var longi=-74.062958;
+var fech = getDateTime();
+function envio_sio(){
+//	if(flag==1){
+			//JSON.stringify(cascopayload) para enviarlo asi
+			io.emit('msg2','cuenta: '+ contador++ +JSON.stringify(cascopayload) );
+			
+			if(lati>5.1){
+				lati=4.5
+			}
+			lati=lati+0.002
+			fech = getDateTime()
+			console.log(fech)
+			io.emit('sendlat',+lati)
+			io.emit('fechita',''+ fech)
+			io.emit('sendlong',+longi)
+			
+	//	}
+}
+////Fin io
+setInterval(envio_sio,3000)
+//setInterval(intervalFunc,7500);
+
 ////////////Fin MQTT
 //middleware
 router.use(function (req, res, next) {
-	const token = req.headers['acces-token'];
+	const token = req.headers['acces-token']; //Prueba postman
 	console.log(token)
 	if(token){
 		jwt.verify(token, llave, (err, decoded) => {
@@ -196,6 +253,7 @@ app.post('/autenticar', (req, res) =>{
 		}
 	})
 });
+//Prueba destruir token
 
 app.post('/cambiarClave', router, function(req, res){
 	regis = mongoose.model("Usuarios", esquemaUsuario);

@@ -11,12 +11,12 @@
       <h2 v-if="Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
     <h2 v-else> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
 
-      <h2>Diferencia long: {{Math.abs(caslongsum-milongsum)}}</h2>
-      <h2>Diferencia lat: {{Math.abs(caslatsum-milatsum)}}</h2>
-      <button @click="Miubicacion()">
+      <!--h2>Diferencia long: {{Math.abs(caslongsum-milongsum)}}</h2-->
+      <!--h2>Diferencia lat: {{Math.abs(caslatsum-milatsum)}}</h2-->
+      <button class="btn btn-primary" @click="Miubicacion()">
         Mi ubicacion
       </button>
-      <button v-on:click="centrarMapa()">
+      <button class="btn btn-warning" v-on:click="centrarMapa()">
         Ubicacion Casco
       </button> 
       <!--button @click="$emit('enviarcoord','hola')">Pasar dato</button-->
@@ -78,6 +78,7 @@ export default {
     LPolygon,
     DatosScreen
   },
+
   data() {
     return {
       variable2: "Inicio Hola",
@@ -183,6 +184,9 @@ export default {
           this.CoordLat = position.coords.latitude;
           this.CoordLong = position.coords.longitude;          
         }
-  }
+
+      
+  },
+
 };
 </script>

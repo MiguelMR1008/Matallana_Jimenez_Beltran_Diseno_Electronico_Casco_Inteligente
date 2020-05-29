@@ -2,10 +2,10 @@
  <div id= "login">
     <h3>Inicio de Sesión</h3>
     <div>{{variable}}</div>
-    <input type="text" v-model="correo" placeholder="Correo"><br>
-    <input type="password" v-model="clave" placeholder="Contraseña" v-on:keyup.13="login()"><br><br>
-    <button type="button" v-on:click="login()">Iniciar sesión</button>
-    <button type="button" v-on:click="registro()">Registrarse</button>
+    <input type="text" class="form-control" v-model="correo" placeholder="Correo"><br>
+    <input type="password" class="form-control" v-model="clave" placeholder="Contraseña" v-on:keyup.13="login()"><br><br>
+    <button type="button" class="btn btn-primary" v-on:click="login()">Iniciar sesión</button>
+    <button type="button" class="btn btn-dark" v-on:click="registro()">Registrarse</button>
  </div>
 
 </template>
