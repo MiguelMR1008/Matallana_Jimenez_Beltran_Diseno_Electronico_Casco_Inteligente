@@ -8,10 +8,11 @@
     </div>
     </div>
     <h1>Configuración</h1>
+    <Streaming v-if= "rol==1 || rol==2"></Streaming>
     <Config />
     <RegistroDispositivo />
-    <RegistroAsociado />
-    <div>
+    <RegistroAsociado v-if= "rol==1 || rol==2"></RegistroAsociado>
+    <!--div>
       <h2>Tipo de usuario: </h2>
       <h2 v-if="tipousuario==1"> Administrador</h2>
       <h2 v-if="tipousuario==2"> Dueño casco</h2>
@@ -37,15 +38,16 @@
   <button type="button" class="btn btn-primary">Guardar cambios</button>
 </form>
       <h5>Activar streaming:   </h5>
-      <h5 v-if="streaming==1">Streaming activado</h5>
-      <h5 v-if="streaming==0">Streaming desactivado</h5>
+      <!--h5 v-if="streaming==1">Streaming activado</h5>
+      <h5 v-if="streaming==0">Streaming desactivado</h5-->
+      <!--div>{{variable}}</div>
       <select id="valoresStream">
       <option value=1> Activado </option> 
       <option value=0>Desactivado</option> 
       </select>
     </br> </br>
       <button type="button" class="btn btn-primary" v-on:click="asignarStream()">Guardar cambios</button>
-    </div>
+    </div-->
 
   </div>
 </template>
@@ -55,23 +57,64 @@
 import RegistroDispositivo from '@/components/RegistroDispositivo.vue'
 import RegistroAsociado from '@/components/RegistroAsociado.vue'
 import Config from '@/components/Config.vue'
+import Streaming from '@/components/Streaming.vue'
 
 export default {
   name: 'Configuracion',
   components: {
     RegistroDispositivo,
     Config,
-    RegistroAsociado
+    RegistroAsociado,
+    Streaming
   },data(){
     return {
-      streaming: 1, //1, activado, 2 desactivado
-      tipousuario:localStorage.rolSession, //3= Usuario normal(asociado),2=Dueño casco, 1=Admin
+      rol:localStorage.rolSession,
+      variable: null,
+      streaming: 3, //1, activado, 2 desactivado
+      //tipousuario:localStorage.rolSession, //3= Usuario normal(asociado),2=Dueño casco, 1=Admin
       modificar:1
       }
+    },
+    created: function(){
+            this.rol=localStorage.rolSession
+            const headers = {
+                'acces-token' : localStorage.tokenSession,
+                'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+                correo : ""
+            }
+            axios.post('http://localhost:3000/consultaToken',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }else{
+                    if(localStorage.estadoStreaming==0)
+                      this.variable="Streaming desactivado"
+                    else
+                      this.variable="Streaming activado"
+                }
+            })
     },
     methods:{
         asignarStream(){
             this.streaming=document.getElementById("valoresStream").value;
+            const headers = {
+                'acces-token' : localStorage.tokenSession,
+                'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+                streaming : this.streaming
+            }
+            axios.post('http://localhost:3000/streaming',data,{
+                headers : headers
+            })
+            .then(res =>{
+                this.variable=res.data.mensaje
+            })
         },
         asignarModificar(){
             this.modificar = !this.modificar;

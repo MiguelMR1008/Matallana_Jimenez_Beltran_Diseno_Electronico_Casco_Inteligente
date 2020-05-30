@@ -433,8 +433,16 @@ app.post('/consultaDispositivos', router, function(req, res){
 	var datos = req.body
 	regis = mongoose.model("Dispositivo", esquemaDispositivo);
 	//var query = { correo: datos.correo }
-	var query = {
-		correoUsuario: req.decoded.correo
+	console.log(req.body)
+	if(req.body.rol==3){
+		var query = {
+			correoUsuario: req.body.correoUsuario
+		}
+	}
+	else{
+		var query = {
+			correoUsuario: req.decoded.correo
+		}
 	}
 	regis.find(query, function(err, result){
 		if(err){
@@ -690,6 +698,35 @@ app.post('/verStreaming', router, function(req, res){
 				res.json({ 
 					mensaje : "Usted no está vinculado a ningún usuario",
 					codigo : 3
+				})
+			}
+		}
+	})
+});
+
+app.post('/correoAsociado', router, function(req, res){
+	regis = mongoose.model("Asociado", esquemaAsociado);
+	var stream
+	var nombreUser
+	var apellidoUser
+	var query = {
+		telAsociado: req.body.telefono
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				res.json({ 
+					mensaje : "Correo encontrado",
+					correoUsuario : result.correoUsuario,
+					codigo : 1
+				})		
+			}else{
+				res.json({ 
+					mensaje : "No se encontro el correo",
+					codigo : 2
 				})
 			}
 		}

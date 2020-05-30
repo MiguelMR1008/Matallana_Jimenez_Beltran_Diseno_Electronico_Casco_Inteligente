@@ -16,35 +16,15 @@
 		<!--buttonbutton v-on:click="verDato(23)" ></button-->
 		<tbody>
 			<tr >
-				<td>Laura</td>
-				<td>Andres</td>
+				<td>Casco 1</td>
+				<td>Álvaro</td>
 				<td>Encendido 
 				<img alt="Logo" src="../assets/encendido.png" width="30" height="30">
-					92%
+					80%
 				<img alt="Logo" src="../assets/batfull.png" width="30" height="30">
 				</td>	
 
-				<td>20/05/20 17:29</td>		
-			</tr>
-			<tr >
-				<td>fdsj932982j982f39</td>
-				<td>Javier</td>
-								<td>Apagado 
-				<img alt="Logo" src="../assets/apagado.png" width="30" height="30">
-					50%
-				<img alt="Logo" src="../assets/batmed.png" width="30" height="30">
-				</td>			
-				<td>12/05/20 10:30</td>
-			</tr>
-			<tr >
-				<td>MiCasco</td>
-				<td>Marco</td>
-				<td>Apagado 
-				<img alt="Logo" src="../assets/apagado.png" width="30" height="30">
-					8%
-				<img alt="Logo" src="../assets/batbaj.png" width="30" height="30">
-				</td>		
-				<td>05/05/20 13:30</td>			
+				<td>29/05/20 09:03</td>		
 			</tr>						
 		</tbody>
 	</table>

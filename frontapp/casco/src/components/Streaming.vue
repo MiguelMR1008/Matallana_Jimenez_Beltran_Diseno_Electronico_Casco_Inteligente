@@ -1,13 +1,19 @@
 <template>
 
- <div id= "registroDisp">
+ <div id= "stream">
     <router-view/>
     <!--h3>Registro</h3-->
-    <h2>Registro Dispositivo</h2>
+    <h2>Tipo de usuario: </h2>
+      <h2 v-if="tipousuario==1"> Administrador</h2>
+      <h2 v-if="tipousuario==2"> Dueño casco</h2>
+      <h2 v-if="tipousuario==3"> Usuario normal (Asociado)</h2><br><br>
+    <h2>Ajustes de streaming</h2>
     <div>{{variable}}</div>
-    <div>Nombre</div>
+    <!--div>Nombre</div>
     <input type="text" v-model="nombreDisp" v-on:keyup.13="registrar()"><br><br>
-    <button type="button" v-on:click="registrar()">Registrar dispositivo</button>
+    <button type="button" v-on:click="registrar()">Registrar dispositivo</button-->
+    <button type="button" v-on:click="activar()">Activar</button>
+    <button type="button" v-on:click="desactivar()">Desactivar</button>
  </div>
 
 </template>
@@ -15,9 +21,10 @@
 <script>
     import axios from 'axios';
     export default {
-        name: 'RegistroDisp',
+        name: 'stream',
         data(){
             return{
+                tipousuario: localStorage.rolSession,
                 variable: null,
                 nombreDisp: null,
             };
@@ -46,57 +53,42 @@
             })
         },*/
         methods:{
-            registrar(){
+            activar(){
                 const headers = {
                     'acces-token' : localStorage.tokenSession,
                     'Authorization' : 'JWT fefege...'
                 }
                 var data = {
-                    'nombreDisp' : this.nombreDisp
+                    streaming : 1
                 }
-                axios.post('http://localhost:3000/registroDispositivo', data,{
+                axios.post('http://localhost:3000/streaming',data,{
                     headers : headers
                 })
                 .then(res =>{
-                    //this.token = res.data.token;
-                    if(res.data.codigo == 2){
-                        this.variable=res.data.mensaje
-                        localStorage.rolSession=2
-                    }else
-                        this.variable=res.data.mensaje
+                    this.variable=res.data.mensaje
                 })
-                /*const headers = {
-                    'Content-Type' : 'application/json',
+            },
+            desactivar(){
+                const headers = {
+                    'acces-token' : localStorage.tokenSession,
                     'Authorization' : 'JWT fefege...'
                 }
-                //this.variable = headers;
                 var data = {
-                    'correo' : this.correo,
-                    'clave' : this.clave
+                    streaming : 0
                 }
-                axios.post('http://localhost:3000/autenticar', data,{
+                axios.post('http://localhost:3000/streaming',data,{
                     headers : headers
                 })
                 .then(res =>{
-                    this.token = res.data.token;
-                    if(this.token != null)
-                        this.$router.push("/about")
-                    else
-                        this.variable="El usuario o contraseña no son correctos"
-                })*/
+                    this.variable=res.data.mensaje
+                })
             }
-            /*hola(){
-                if(this.correo=="Miguel"&&this.clave=="Matallana")
-                    this.variable = "Hola "+this.correo+" Crack";
-                else
-                    this.variable = this.correo+" es un marrano";
-            }*/
         }
     }
 </script>
 
 <style>
-    #registroDisp {
+    #stream {
         width: 500px;
         border: 1px solid #CCCCCC;
         background-color: #008080;

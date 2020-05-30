@@ -33,8 +33,8 @@
                 telefono: null,
                 correo: null,
                 clave: null,
-                telefono2: null,
                 rol: null,
+                streaming: null,
             };
         },
         /*created: function(){
@@ -54,8 +54,8 @@
                     'telefono' : this.telefono,
                     'correo' : this.correo,
                     'clave' : this.clave,
-                    'telefono2' : this.telefono2,
-                    'rol' : 2
+                    'rol' : 3,
+                    'streaming' : 0
                 }
                 axios.post('http://localhost:3000/registroUsuario', data,{
                     headers : headers

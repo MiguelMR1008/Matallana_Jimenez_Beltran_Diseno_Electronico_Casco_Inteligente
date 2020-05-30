@@ -1,7 +1,8 @@
 <template>
  <div class= "data"><br><br>
 
-	<div>{{variable}}</div>
+	<div>{{variable}}</div><br>
+	<div>{{esperar}}</div>
  	<!--Mapa 
 	 :recibirCoordenadas="recibirCoordenadas"
 	  @verregistro="Prueba($event)"
@@ -49,6 +50,7 @@
 				datos: [],
 				variable: null,
 				correo: null,
+				correoAsociado: null,
 				clave: null,
 				data: null,
 				headers: null,
@@ -66,40 +68,84 @@
                 'acces-token' : localStorage.tokenSession,
                 'Authorization' : 'JWT fefege...'
             }
-            this.data = {
-            	request: " "
-            }
-            axios.post('http://localhost:3000/consultaDispositivos',this.data,{
-                headers : this.headers
-            }).then(res =>{
-            	if(res.data.codigo != 0){
+            //while(this.esperar==0){
+	            if(localStorage.rolSession==3){
+		            this.data = {
+		            	telefono: localStorage.telefono
+		            }
+		            axios.post('http://localhost:3000/correoAsociado',this.data,{
+		                headers : this.headers
+		            }).then(res =>{
+		            	if(res.data.codigo != 0){			//si código es diferente a 0 quiere decir que token está activo
 
-            		this.dispositivos = res.data
+		            		this.correoAsociado=res.data.correoUsuario
+		            		//this.variable=this.correoAsociado
+		            		this.data = {
+						        correoUsuario : this.correoAsociado,
+						        rol : localStorage.rolSession
+						    }
+		            		axios.post('http://localhost:3000/consultaDispositivos',this.data,{
+				                headers : this.headers
+				            }).then(res =>{
+				            	if(res.data.codigo != 0){
 
+				            		this.dispositivos = res.data
+				            		var i
+				            		for( i=0; i < this.dispositivos.length; i++){
+				            			this.cont=this.cont+1;
+				            			this.data={
+				            				IDdisp : this.dispositivos[i]._id
+				            			}
+				            			axios.post('http://localhost:3000/consultaDatos',this.data,{
+							                headers : this.headers
+							            }).then(res =>{
+							            	if(res.data.codigo != 0)
+							            		//this.datos.push(res.data)
+							            		this.datos = this.datos.concat(res.data)
+							            	
+										})
+				            		}
+				            		
+				            	}else{
+				            		this.$router.push("/")
+				      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+				            	}
+							})
+		            	}
+					})
+	        	}
+	        	else{
+	        		this.data = {
+				        rol : localStorage.rolSession
+				    }
+	        		axios.post('http://localhost:3000/consultaDispositivos',this.data,{
+		                headers : this.headers
+		            }).then(res =>{
+		            	if(res.data.codigo != 0){
 
-
-            		//this.variable = this.dispositivos.length
-            		var i
-            		for( i=0; i < this.dispositivos.length; i++){
-            			this.cont=this.cont+1;
-            			this.data={
-            				IDdisp : this.dispositivos[i]._id
-            			}
-            			axios.post('http://localhost:3000/consultaDatos',this.data,{
-			                headers : this.headers
-			            }).then(res =>{
-			            	if(res.data.codigo != 0)
-			            		//this.datos.push(res.data)
-			            		this.datos = this.datos.concat(res.data)
-			            	
-						})
-            		}
-            		
-            	}else{
-            		this.$router.push("/")
-      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
-            	}
-			})
+		            		this.dispositivos = res.data
+		            		var i
+		            		for( i=0; i < this.dispositivos.length; i++){
+		            			this.cont=this.cont+1;
+		            			this.data={
+		            				IDdisp : this.dispositivos[i]._id
+		            			}
+		            			axios.post('http://localhost:3000/consultaDatos',this.data,{
+					                headers : this.headers
+					            }).then(res =>{
+					            	if(res.data.codigo != 0)
+					            		//this.datos.push(res.data)
+					            		this.datos = this.datos.concat(res.data)
+					            	
+								})
+		            		}
+		            		
+		            	}else{
+		            		this.$router.push("/")
+		      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+		            	}
+					})
+	        	}
 		},
 		methods:{
 			verDato: function (lati){

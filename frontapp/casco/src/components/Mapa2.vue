@@ -3,14 +3,14 @@
   <div style="height: 500px; width: 100%">
     <div style="height: 200px overflow: auto;">
     
-      <p>Coordenadas casco:  {{ CoordCasco }}</p>
-      <p>Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p>
+      <p v-if="streaming==1">Coordenadas casco:  {{ CoordCasco }}</p>
+      <p v-if="streaming==1">Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p><br>
       <!--p v-if="!Number.isNaN(Distancia) ">Distancia aproximada:  {{ Distancia }} Km</p-->
       <!--p v-else>Menos de 700m</p-->
-
-      <h2 v-if="Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
-    <h2 v-else> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
-  <h2>Último registro: {{fecha}} </h2>
+      <h2>{{variable2}}</h2><br><br>
+      <h2 v-if= "streaming==1 && Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
+    <h2 v-else-if="streaming==1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
+  <h2 v-if="streaming==1">Último registro: {{fecha}} </h2>
       <!--h2>Último registro: 20/04/20 15:30 (Hace 5 minutos)</h2-->
       <button v-if="estado==1" type="button" class="btn btn-success">Estado: Encendido</button>
       <button v-else type="button" class="btn btn-danger">Estado: Apagado</button>
@@ -18,7 +18,7 @@
       <button v-if="streaming==1"type="button" class="btn btn-success">Streaming: Encendido</button>
       <button v-else type="button" class="btn btn-danger">Streaming: Apagado</button>
     </br></br>
-      <button @click="Miubicacion()">
+      <button v-if= "streaming==1" @click="Miubicacion()">
         Mi ubicacion
       </button>
       <!--button @click="$emit('enviarcoord','hola')">Pasar dato</button-->
@@ -80,9 +80,9 @@ export default {
   },
   data() {
     return {
-      variable2: "Inicio Hola",
+      variable2: null,
       estado:1,
-      streaming:1,
+      streaming:null,
       socket:{}, //Para manejar socketio
       alerta:0,
       contador: "",
@@ -205,16 +205,31 @@ export default {
                 'Authorization' : 'JWT fefege...'
             }
             var data = {
-                correo : ""
+                telefono : localStorage.telefono
             }
-            axios.post('http://localhost:3000/consultaToken',data,{
+            axios.post('http://localhost:3000/verStreaming',data,{
                 headers : headers
             })
             .then(res =>{
-                if(res.data.codigo == 0){
+                if(res.data.codigo == 0){                                                   //no se pudo autenticar
                     this.$router.push("/")
                     localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }else if(localStorage.rolSession==3){                                     //Se comprueba que el usuario de la sesion actual sea asociado(rol=3)    
+
+                /*
+                  Codigo==1 autenticado, sí es allegado, streaming activado
+                  Codigo==2 autenticado, sí es allegado, streaming desactivado
+                  Codigo==1 autenticado, no es allegado
+                */         
+                  if(res.data.codigo == 3){         
+                    this.variable2=res.data.mensaje
+                  }else
+                    this.variable2="Usted es allegado de "+res.data.nombreUsuario+" "+res.data.apellidoUsuario
+                  this.streaming=res.data.codigo
+                }else{
+                  this.streaming=1
                 }
+                
             })
         },
   mounted(){
