@@ -5,15 +5,15 @@
       <router-link to="/home"><button class="btn btn-secondary">Volver</button></router-link>
     </div>
   	<h1>Estado dispositivos</h1>
-
-    	<table class="table table-dark">
+  	<Estado />
+    	<!--table class="table table-dark">
 		<thead>
 			<th scope="col">Dispositivo</th>
 			<th scope="col">Dueño dispositivo</th>
 			<th scope="col">Estado</th>				
 			<th scope="col">Ultima conexión</th>
 		</thead>
-		<!--buttonbutton v-on:click="verDato(23)" ></button-->
+		<buttonbutton v-on:click="verDato(23)" ></button>
 		<tbody>
 			<tr >
 				<td>Casco 1</td>
@@ -27,19 +27,19 @@
 				<td>29/05/20 09:03</td>		
 			</tr>						
 		</tbody>
-	</table>
+	</table-->
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-//import Estado from '@/components/Estado.vue'
+import Estado from '@/components/Estado.vue'
 import axios from 'axios';//axios para el token
 export default {
   name: 'Estadodis',
   components: {
-  	//Estado
-  },
+  	Estado
+  }/*,
           created: function(){ //Negar si no tiene el token
             const headers = {
                 'acces-token' : localStorage.tokenSession,
@@ -57,7 +57,7 @@ export default {
                     localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
                 }
             })
-        },
+        },*/
 }
 
 </script>

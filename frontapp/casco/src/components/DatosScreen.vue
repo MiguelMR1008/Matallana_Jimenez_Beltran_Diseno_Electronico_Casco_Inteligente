@@ -2,10 +2,10 @@
  <div class= "data"><br><br>
 
 	<div>{{variable}}</div><br>
-	<div>{{esperar}}</div>
+	<!--div>{{esperar}}</div>
 	<h2>{{variable2}}</h2><br>
 	<h2>{{variable3}}</h2><br>
-	<button class="btn btn-primary" type="button" @click="boton()">Ver nombre</button><br><br>
+	<button class="btn btn-primary" type="button" @click="boton()">Ver nombre</button><br><br-->
  	<!--Mapa 
 	 :recibirCoordenadas="recibirCoordenadas"
 	  @verregistro="Prueba($event)"
@@ -97,8 +97,7 @@
 
 				            		this.dispositivos = res.data
 				            		var i
-				            		var j
-				            		var k
+						            var j
 				            		for( i=0; i < this.dispositivos.length; i++){
 				            			this.cont=this.cont+1;
 				            			this.data={
@@ -113,19 +112,31 @@
 							            	
 										})
 				            		}
-				            		
 				            		for( i=0; i < this.dispositivos.length; i++ ){
-				            			this.data={
-				            				IDdisp : this.dispositivos[i]._id
-				            			}
-				            			axios.post('http://localhost:3000/nombreDispositivo',this.data,{
-							                headers : this.headers
-							            }).then(res =>{
-							            	if(res.data.codigo != 0)
-							            		this.nombresdisp[i] = res.data.nombresdisp
+						            	this.data={
+						            		IDdisp : this.dispositivos[i]._id
+						            	}
+						            	axios.post('http://localhost:3000/nombreDispositivo',this.data,{
+									        headers : this.headers
+									    }).then(res =>{
+									       	if(res.data.codigo != 0)
+									        	this.nombresdisp = this.nombresdisp.concat(res.data.nombreDisp)
 										})
-				            		}
-				            		console.log(this.nombresdisp)
+
+						            }
+						            /*
+									 PENDIENTE ORDEN DE LOS CASCOS
+						            */
+						            setTimeout(() => {
+						            	for( i=0; i < this.dispositivos.length; i++ ){
+										//this.variable3="Tamaño datos "+this.datos.length
+											for( j=0; j < this.datos.length; j++ ){
+												if(this.datos[j].IDdisp==this.dispositivos[i]._id)
+													this.datos[j].IDdisp=this.nombresdisp[i]
+											}
+										}
+						            }, 500);
+
 				            	}else{
 				            		this.$router.push("/")
 				      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";

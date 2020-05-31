@@ -614,21 +614,95 @@ app.post('/registroAsociado',router, function (req, res){
 						codigo : 1
 					})
 				}else{
-					datos = {
-						"nombreAsociado" : req.body.nombreAsociado,
-						"telAsociado" : req.body.telAsociado,
-						"correoUsuario" : req.decoded.correo
-					};
-					myData= new regis(datos)
-					insertarBD(myData)
-					res.json({ 
-						mensaje : "Registro de asociado exitoso",
-						codigo : 0
+					regis = mongoose.model("Usuarios", esquemaUsuario); 
+					var query = {
+						telefono: req.body.telAsociado
+					}
+					regis.findOne(query, function(err, result){
+						if(result){
+							regis = mongoose.model("Asociado", esquemaAsociado); 
+							datos = {
+								"nombreAsociado" : req.body.nombreAsociado,
+								"telAsociado" : req.body.telAsociado,
+								"correoUsuario" : req.decoded.correo
+							};
+							myData= new regis(datos)
+							insertarBD(myData)
+							res.json({ 
+								mensaje : "Registro de asociado exitoso",
+								codigo : 2
+							})
+						}else{
+							res.json({ 
+								mensaje : "No existe un usuario asociado a este número de teléfono",
+								codigo : 2
+							})
+						}
 					})
+
+
+					
+
 				}
 			}
 		})
 	}
+});
+
+app.post('/eliminarAllegado', router, (req, res) =>{
+	regis = mongoose.model("Asociado", esquemaAsociado);
+	query = { 
+		$and:[
+		{ telAsociado: req.body.telAsociado},
+		{ correoUsuario : req.decoded.correo}
+		]
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+			res.send("Error")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				regis.deleteOne(query, function(err, result){
+					if(err){
+						console.log("No se pudo eliminar usuario")
+						res.send({
+							mensaje : "Error. No se pudo eliminar el usuario",
+							codigo : 2
+						})
+					}else{
+						res.send({
+							mensaje : "Se ha elimindao el usuario allegado",
+							codigo : 3
+						})
+					}
+				})
+			}else{
+				res.json({ 
+					mensaje : "El usuario no es allegado"
+				})
+			}
+		}
+	})
+});
+
+app.post('/consultaAllegados', router, function(req, res){
+	var datos = req.body
+	regis = mongoose.model("Asociado", esquemaAsociado);
+	var query = {
+		correoUsuario: req.decoded.correo
+	}
+	regis.find(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+			res.send("Error")
+		}else{
+			console.log("Consulta OK")
+			res.send(result)
+			console.log(result)
+		}
+	})
 });
 
 app.post('/streaming', router, function(req, res){
@@ -748,8 +822,7 @@ app.post('/verStreaming', router, function(req, res){
 app.post('/correoAsociado', router, function(req, res){
 	regis = mongoose.model("Asociado", esquemaAsociado);
 	var stream
-	var nombreUser
-	var apellidoUser
+	var correoUser
 	var query = {
 		telAsociado: req.body.telefono
 	}
@@ -759,11 +832,24 @@ app.post('/correoAsociado', router, function(req, res){
 		}else{
 			console.log("Consulta OK")
 			if(result){
-				res.json({ 
-					mensaje : "Correo encontrado",
-					correoUsuario : result.correoUsuario,
-					codigo : 1
-				})		
+				regis = mongoose.model("Cliente", esquemaCliente);
+				correoUser=result.correoUsuario
+				query = {
+					correo: result.correoUsuario
+				}
+				regis.findOne(query, function(err, result){
+					if(err){
+						console.log("Error en la consulta")
+					}else{
+
+						res.json({ 
+							mensaje : "Correo encontrado",
+							correoUsuario : correoUser,
+							nombre : result.nombre,
+							codigo : 1
+						})	
+					}
+				})	
 			}else{
 				res.json({ 
 					mensaje : "No se encontro el correo",
@@ -839,6 +925,19 @@ app.post('/consultaToken', router, function(req, res){
 		mensaje: "Token activo",
 		codigo: 1
 	})
+});
+
+app.post('/ultimoDato', function(req, res){
+	regis = mongoose.model("Registro", esquemaRegistro);
+	console.log(req.body)
+
+	var query = {
+		IDdisp: req.body.IDdisp
+	}
+	regis.findOne(query).sort({"fechaRegis": -1}).exec(function(err,result){
+	  if (err) throw err;
+	  res.json(result);
+	});
 });
 //------------------------------ Version 1 ----------------------------------
 
