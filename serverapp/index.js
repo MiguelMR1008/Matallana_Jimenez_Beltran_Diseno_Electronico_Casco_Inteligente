@@ -475,6 +475,47 @@ app.post('/consultaDatos', router, function(req, res){
 	})
 });
 
+app.post('/consultaDatos2', router, function(req, res){
+	var datos = req.body
+	console.log(datos)
+	var nombredispositivo
+	regis = mongoose.model("Dispositivo", esquemaDispositivo);
+	//var query = { correo: datos.correo }
+	var query = {
+		_id: datos.IDdisp
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+			res.send("Error")
+		}else{
+			nombredispositivo=result.nombreDisp
+			console.log(nombredispositivo)
+			query = {
+				IDdisp: datos.IDdisp
+			}
+			regis = mongoose.model("Registro", esquemaRegistro);
+			regis.find(query, function(err, result){
+				if(err){
+					console.log("Error en la consulta")
+					res.send("Error")
+				}else{
+					console.log("Consulta OK")
+					res.json({
+						IDdisp : result.IDdisp,
+						intensidadGolpe : result.intensidadGolpe,
+						latitud : result.latitud,
+						longitud : result.longitud,
+						nivelBateria : result.nivelBateria,
+						nombreDisp : nombredispositivo
+					})
+				}
+			})
+
+		}
+	})
+});
+
 app.post('/registroDispositivo',router, function (req, res){
 	regis = mongoose.model("Dispositivo", esquemaDispositivo); 
 	console.log(req.body)
@@ -726,6 +767,33 @@ app.post('/correoAsociado', router, function(req, res){
 			}else{
 				res.json({ 
 					mensaje : "No se encontro el correo",
+					codigo : 2
+				})
+			}
+		}
+	})
+});
+
+app.post('/nombreDispositivo', router, function(req, res){
+	regis = mongoose.model("Dispositivo", esquemaDispositivo);
+	console.log(req.body)
+	var query = {
+		_id: req.body.IDdisp
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				res.json({ 
+					mensaje : "Dispositivo encontrado",
+					nombreDisp : result.nombreDisp,
+					codigo : 1
+				})	
+			}else{
+				res.json({ 
+					mensaje : "No se encontro el dispositivo",
 					codigo : 2
 				})
 			}

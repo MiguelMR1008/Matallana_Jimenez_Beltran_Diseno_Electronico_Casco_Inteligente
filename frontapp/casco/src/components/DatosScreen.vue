@@ -3,6 +3,9 @@
 
 	<div>{{variable}}</div><br>
 	<div>{{esperar}}</div>
+	<h2>{{variable2}}</h2><br>
+	<h2>{{variable3}}</h2><br>
+	<button class="btn btn-primary" type="button" @click="boton()">Ver nombre</button><br><br>
  	<!--Mapa 
 	 :recibirCoordenadas="recibirCoordenadas"
 	  @verregistro="Prueba($event)"
@@ -47,8 +50,11 @@
 		data(){
 			return{
 				dispositivos: null,
+				nombresdisp: [],
 				datos: [],
 				variable: null,
+				variable2: null,
+				variable3: null,
 				correo: null,
 				correoAsociado: null,
 				clave: null,
@@ -91,6 +97,8 @@
 
 				            		this.dispositivos = res.data
 				            		var i
+				            		var j
+				            		var k
 				            		for( i=0; i < this.dispositivos.length; i++){
 				            			this.cont=this.cont+1;
 				            			this.data={
@@ -106,6 +114,18 @@
 										})
 				            		}
 				            		
+				            		for( i=0; i < this.dispositivos.length; i++ ){
+				            			this.data={
+				            				IDdisp : this.dispositivos[i]._id
+				            			}
+				            			axios.post('http://localhost:3000/nombreDispositivo',this.data,{
+							                headers : this.headers
+							            }).then(res =>{
+							            	if(res.data.codigo != 0)
+							            		this.nombresdisp[i] = res.data.nombresdisp
+										})
+				            		}
+				            		console.log(this.nombresdisp)
 				            	}else{
 				            		this.$router.push("/")
 				      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
@@ -125,6 +145,7 @@
 
 		            		this.dispositivos = res.data
 		            		var i
+				            var j
 		            		for( i=0; i < this.dispositivos.length; i++){
 		            			this.cont=this.cont+1;
 		            			this.data={
@@ -139,13 +160,54 @@
 					            	
 								})
 		            		}
-		            		
+		            		for( i=0; i < this.dispositivos.length; i++ ){
+				            	this.data={
+				            		IDdisp : this.dispositivos[i]._id
+				            	}
+				            	axios.post('http://localhost:3000/nombreDispositivo',this.data,{
+							        headers : this.headers
+							    }).then(res =>{
+							       	if(res.data.codigo != 0)
+							        	this.nombresdisp = this.nombresdisp.concat(res.data.nombreDisp)
+								})
+
+				            }
+				            /*
+							 PENDIENTE ORDEN DE LOS CASCOS
+				            */
+				            setTimeout(() => {
+				            	for( i=0; i < this.dispositivos.length; i++ ){
+								//this.variable3="Tamaño datos "+this.datos.length
+									for( j=0; j < this.datos.length; j++ ){
+										if(this.datos[j].IDdisp==this.dispositivos[i]._id)
+											this.datos[j].IDdisp=this.nombresdisp[i]
+									}
+								}
+				            }, 500);
+
 		            	}else{
 		            		this.$router.push("/")
 		      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
 		            	}
 					})
 	        	}
+		},
+		mounted(){
+				var i
+				var j
+				//var cont  = 0
+				//var cont2 = 0
+				for( i=0; i < this.dispositivos.length; i++ ){
+					//this.variable3="Tamaño datos "+this.datos.length
+					for( j=0; j < this.datos.length; j++ ){
+						if(this.datos[j].IDdisp==this.dispositivos[i]._id)
+							this.datos[j].IDdisp=this.nombresdisp[i]
+						//cont++
+						//this.variable2="Contador dispositivos "+cont
+					}
+					//cont2++
+					//this.variable3="Contador dispositivos "+cont2
+				}
 		},
 		methods:{
 			verDato: function (lati){
@@ -159,6 +221,44 @@
 			},
 			Prueba(dato){
 				alert(dato);
+			},
+			boton(){
+				//this.variable2=this.nombresdisp.length
+				//this.variable2=this.datos.length
+
+				this.variable2=this.nombresdisp[0] + "       " + this.nombresdisp[1]
+				this.variable3=this.dispositivos[0]._id + "      " + this.dispositivos[1]._id
+				/*this.variable2="1"
+				setTimeout(() => { console.log("World!"); }, 2000);
+				this.variable2="2"*/
+				var i
+				var j
+				var cont  = 0
+				var cont2 = 0
+				for( i=0; i < this.dispositivos.length; i++ ){
+					//this.variable3="Tamaño datos "+this.datos.length
+					for( j=0; j < this.datos.length; j++ ){
+						if(this.datos[j].IDdisp==this.dispositivos[i]._id)
+							this.datos[j].IDdisp=this.nombresdisp[i]
+						cont++
+						//this.variable2="Contador dispositivos "+cont
+					}
+					cont2++
+					//this.variable3="Contador dispositivos "+cont2
+				}
+				/*for( i=0; i < this.dispositivos.length; i++ ){
+				            	this.data={
+				            		IDdisp : this.dispositivos[i]._id
+				            	}
+				            	axios.post('http://localhost:3000/nombreDispositivo',this.data,{
+							        headers : this.headers
+							    }).then(res =>{
+							       	if(res.data.codigo != 0)
+							        	this.nombresdisp[i] = res.data.nombreDisp
+							        this.variable2=this.nombresdisp[i]
+								})
+
+				            }*/
 			}
 		}
 	}
