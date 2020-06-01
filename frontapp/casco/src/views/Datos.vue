@@ -47,7 +47,8 @@ export default {
                 'Authorization' : 'JWT fefege...'
             }
             var data = {
-                telefono : localStorage.telefono
+                telefono : localStorage.telefono,
+                rol : localStorage.rolSession
             }
             axios.post('http://localhost:3000/verStreaming',data,{
                 headers : headers
@@ -63,12 +64,13 @@ export default {
                   Codigo==2 autenticado, sí es allegado, streaming desactivado
                   Codigo==1 autenticado, no es allegado
                 */         
-                  if(res.data.codigo == 3){         
+                  if(res.data.codigo == 4){         
                     this.variable2=res.data.mensaje
                     this.asociado=0
-                  }else
+                  }else{
                     this.variable2="Usted es allegado de "+res.data.nombreUsuario+" "+res.data.apellidoUsuario
-                  this.asociado=1
+                    this.asociado=1
+                  }
                 }                
             })
         }

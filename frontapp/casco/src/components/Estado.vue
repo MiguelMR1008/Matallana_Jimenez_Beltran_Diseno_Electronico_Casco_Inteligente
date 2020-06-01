@@ -4,8 +4,9 @@
  	<!--Mapa 
 	 :recibirCoordenadas="recibirCoordenadas"
 	  @verregistro="Prueba($event)"
-	/-->					
-	<table class="table table-dark">
+	/-->	
+	<h2 v-if="visible==0">{{variable}}</h2>			
+	<table v-if="visible==1" class="table table-dark">
 		<thead>
 			<th scope="col">Dispositivo</th>
 			<th scope="col">Dueño dispositivo</th>
@@ -57,6 +58,7 @@
 				data: null,
 				headers: null,
 				cont: 0,
+				visible: null,
 				//Variables mapa
 			};
 		},
@@ -77,67 +79,75 @@
 
 		            		this.correoAsociado=res.data.correoUsuario
 		            		this.nombreUsuario=res.data.nombre
-		            		//this.variable=this.correoAsociado
-		            		this.data = {
-						        correoUsuario : this.correoAsociado,
-						        rol : localStorage.rolSession
-						    }
-		            		axios.post('http://localhost:3000/consultaDispositivos',this.data,{
-				                headers : this.headers
-				            }).then(res =>{
-				            	if(res.data.codigo != 0){
+		            		//this.variable=res.data.codigo
+		            		if(res.data.codigo==1){
+		            			this.visible=1
+			            		this.data = {
+							        correoUsuario : this.correoAsociado,
+							        rol : localStorage.rolSession
+							    }
+			            		axios.post('http://localhost:3000/consultaDispositivos',this.data,{
+					                headers : this.headers
+					            }).then(res =>{
+					            	if(res.data.codigo != 0){
 
-				            		this.dispositivos = res.data
-				            		var i
-						            var j
-				            		for( i=0; i < this.dispositivos.length; i++){
-				            			this.cont=this.cont+1;
-				            			this.data={
-				            				IDdisp : this.dispositivos[i]._id
-				            			}
-				            			axios.post('http://localhost:3000/ultimoDato',this.data,{
-							                headers : this.headers
-							            }).then(res =>{
-							            	if(res.data.codigo != 0)
-							            		//this.datos.push(res.data)
-							            		this.datos = this.datos.concat(res.data)
-							            	
-										})
-				            		}
-				            		for( i=0; i < this.dispositivos.length; i++ ){
-						            	this.data={
-						            		IDdisp : this.dispositivos[i]._id
-						            	}
-						            	axios.post('http://localhost:3000/nombreDispositivo',this.data,{
-									        headers : this.headers
-									    }).then(res =>{
-									       	if(res.data.codigo != 0)
-									        	this.nombresdisp = this.nombresdisp.concat(res.data.nombreDisp)
-										})
+					            		this.dispositivos = res.data
+					            		var i
+							            var j
+					            		for( i=0; i < this.dispositivos.length; i++){
+					            			this.cont=this.cont+1;
+					            			this.data={
+					            				IDdisp : this.dispositivos[i]._id
+					            			}
+					            			axios.post('http://localhost:3000/ultimoDato',this.data,{
+								                headers : this.headers
+								            }).then(res =>{
+								            	if(res.data.codigo != 0)
+								            		//this.datos.push(res.data)
+								            		this.datos = this.datos.concat(res.data)
+								            	
+											})
+					            		}
+					            		for( i=0; i < this.dispositivos.length; i++ ){
+							            	this.data={
+							            		IDdisp : this.dispositivos[i]._id
+							            	}
+							            	axios.post('http://localhost:3000/nombreDispositivo',this.data,{
+										        headers : this.headers
+										    }).then(res =>{
+										       	if(res.data.codigo != 0)
+										        	this.nombresdisp = this.nombresdisp.concat(res.data.nombreDisp)
+											})
 
-						            }
-						            /*
-									 PENDIENTE ORDEN DE LOS CASCOS
-						            */
-						            setTimeout(() => {
-						            	for( i=0; i < this.dispositivos.length; i++ ){
-										//this.variable3="Tamaño datos "+this.datos.length
-											for( j=0; j < this.datos.length; j++ ){
-												if(this.datos[j].IDdisp==this.dispositivos[i]._id)
-													this.datos[j].IDdisp=this.nombresdisp[i]
+							            }
+							            /*
+										 PENDIENTE ORDEN DE LOS CASCOS
+							            */
+							            setTimeout(() => {
+							            	for( i=0; i < this.dispositivos.length; i++ ){
+											//this.variable3="Tamaño datos "+this.datos.length
+												for( j=0; j < this.datos.length; j++ ){
+													if(this.datos[j].IDdisp==this.dispositivos[i]._id)
+														this.datos[j].IDdisp=this.nombresdisp[i]
+												}
 											}
-										}
-						            }, 500);
+							            }, 500);
 
-				            	}else{
-				            		this.$router.push("/")
-				      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
-				            	}
-							})
-		            	}
+					            	}else{
+					            		this.$router.push("/")
+					      				localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+					            	}
+								})
+							}
+							else{
+								this.visible=0
+								this.variable="Usted no está vinculado a ningún usuario"
+							}
+		            	}///
 					})
 	        	}
 	        	else{
+	        		this.visible=1
 	        		this.nombreUsuario=localStorage.nombreUsuario
 	        		this.data = {
 				        rol : localStorage.rolSession

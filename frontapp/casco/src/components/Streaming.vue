@@ -7,6 +7,8 @@
       <h2 v-if="tipousuario==1"> Administrador</h2>
       <h2 v-if="tipousuario==2"> Dueño casco</h2>
       <h2 v-if="tipousuario==3"> Usuario normal (Asociado)</h2><br><br>
+      <h2 v-if="streamingSession==1">Estado streaming: Activado</h2>
+      <h2 v-else>Estado streaming: Desactivado</h2><br>
     <h2>Ajustes de streaming</h2>
     <div>{{variable}}</div>
     <!--div>Nombre</div>
@@ -27,9 +29,11 @@
                 tipousuario: localStorage.rolSession,
                 variable: null,
                 nombreDisp: null,
+                streamingSession: localStorage.estadoStreaming,
             };
         },
         created: function(){
+            this.streamingSession= localStorage.estadoStreaming
             const headers = {
                 'acces-token' : localStorage.tokenSession,
                 'Authorization' : 'JWT fefege...'
@@ -66,6 +70,10 @@
                 })
                 .then(res =>{
                     this.variable=res.data.mensaje
+                    localStorage.estadoStreaming=1
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 3000);
                 })
             },
             desactivar(){
@@ -81,6 +89,10 @@
                 })
                 .then(res =>{
                     this.variable=res.data.mensaje
+                    localStorage.estadoStreaming=0
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 3000);
                 })
             }
         }

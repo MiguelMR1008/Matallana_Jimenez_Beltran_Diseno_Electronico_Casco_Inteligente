@@ -127,7 +127,7 @@
 		        	if(res.data.codigo==1)
 		        		setTimeout(() => {
                             window.location.reload()
-                        }, 5000);
+                        }, 3000);
 		        })
 			},
 			modificarBoton(tel){

@@ -123,26 +123,50 @@ function intervalFunc(){
 var contador = 0;
 var lati=4.691918;
 var longi=-74.062958;
+var lati2=6.2518400;
+var longi2=-75.5635900;
 var fech = getDateTime();
 
 function envio_sio(){
 //	if(flag==1){
 			//JSON.stringify(cascopayload) para enviarlo asi
-			io.emit('msg2','cuenta: '+ contador++ +JSON.stringify(cascopayload) );
+			//io.emit('msg2','cuenta: '+ contador++ +JSON.stringify(cascopayload) );
 			contador++;
 			if(contador>=5){
-				io.emit('alarma',1);
+				//io.emit('alarma',1);
 				contador=0;
 			}
 			if(lati>5.1){
 				lati=4.5
 			}
+			if(lati2>7){
+				lati2=6
+			}
 			lati=lati+0.002
+			lati2=lati2+0.002
 			fech = getDateTime()
 			console.log(fech)
-			io.emit('sendlat',+lati)
+			var data ={
+				'idDisp':"5e962540ef6a6459d46d128a",
+				'sendlat':lati,
+				'sendlong':longi,
+				'fechita':fech,
+				'accidente':0,
+				'estadoDisp':1
+			}
+			io.emit('5e962540ef6a6459d46d128a',data)
+			var data2 ={
+				'idDisp':"5e9f6a4c1eb5f23a2c8861d6",
+				'sendlat':lati2,
+				'sendlong':longi2,
+				'fechita':fech,
+				'accidente':0,
+				'estadoDisp':1
+			}
+			io.emit('5e9f6a4c1eb5f23a2c8861d6',data2)
+			/*io.emit('sendlat',+lati)
 			io.emit('fechita',''+ fech)
-			io.emit('sendlong',+longi)
+			io.emit('sendlong',+longi)*/
 			
 	//	}
 }
@@ -256,6 +280,7 @@ app.post('/autenticar', (req, res) =>{
 					mensaje : 'Autenticación correcta',
 					token : token,
 					rol : result.rol,
+					streaming: result.streaming,
 					codigo : 0
 				});
 			}else{
@@ -323,17 +348,25 @@ app.post('/eliminarUsuario', router, (req, res) =>{
 							}else{
 								query = { correoUsuario : req.decoded.correo}
 								regis = mongoose.model("Dispositivo", esquemaDispositivo);
-								regis.collection.update(query,
-								{
-									"_id": result._id,
-									"nombreDisp": "",
-									"correoUsuario": ""
+								regis.findOne(query, function(err, result){
+									if(err){
+										console.log("No se pudó eliminar el dispositivo")
+										res.send("Error")
+									}else{
+										regis.collection.update(query,
+										{
+											"_id": result._id,
+											"nombreDisp": "",
+											"correoUsuario": ""
+										})
+										console.log("Usuario eliminado")
+										res.send({
+											mensaje : "Usuario eliminado correctamente",
+											codigo : 1
+										})
+									}
 								})
-								console.log("Usuario eliminado")
-								res.send({
-									mensaje : "Usuario eliminado correctamente",
-									codigo : 1
-								})
+								
 								/*regis.deleteOne(query, function(err, result){
 									if(err){
 										console.log("No se pudo eliminar el dispositivo")
@@ -913,7 +946,7 @@ app.post('/verStreaming', router, function(req, res){
 				if(req.body.rol==3){
 					res.json({ 
 						mensaje : "Usted no está vinculado a ningún usuario",
-						codigo : 3
+						codigo : 4
 					})
 				}else{
 					res.json({ 
@@ -949,18 +982,24 @@ app.post('/correoAsociado', router, function(req, res){
 					if(err){
 						console.log("Error en la consulta")
 					}else{
-
-						res.json({ 
-							mensaje : "Correo encontrado",
-							correoUsuario : correoUser,
-							nombre : result.nombre,
-							codigo : 1
-						})	
+						if(result){
+							res.json({ 
+								mensaje : "Correo encontrado",
+								correoUsuario : correoUser,
+								nombre : result.nombre,
+								codigo : 1
+							})	
+						}else{
+							res.json({ 
+								mensaje : "Usted no está vinculado a ningún usuario",
+								codigo : 3
+							})
+						}
 					}
 				})	
 			}else{
 				res.json({ 
-					mensaje : "No se encontro el correo",
+					mensaje : "No se encontró el correo",
 					codigo : 2
 				})
 			}
@@ -983,6 +1022,7 @@ app.post('/nombreDispositivo', router, function(req, res){
 				res.json({ 
 					mensaje : "Dispositivo encontrado",
 					nombreDisp : result.nombreDisp,
+					IDdisp : result._id,
 					codigo : 1
 				})	
 			}else{
@@ -1054,8 +1094,8 @@ app.post('/crearDispositivo', router, function(req, res){
 	if(permiso==1){
 		regis = mongoose.model("Dispositivo", esquemaDispositivo);
 		var datos = {
-			"nombreDisp": null,
-			"correoUsuario": null,
+			"nombreDisp": "",
+			"correoUsuario": "",
 		}
 		myData= new regis(datos)
 		insertarBD(myData)

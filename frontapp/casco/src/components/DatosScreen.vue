@@ -112,7 +112,7 @@
 							            	
 										})
 				            		}
-				            		for( i=0; i < this.dispositivos.length; i++ ){
+				            		/*for( i=0; i < this.dispositivos.length; i++ ){
 						            	this.data={
 						            		IDdisp : this.dispositivos[i]._id
 						            	}
@@ -120,10 +120,10 @@
 									        headers : this.headers
 									    }).then(res =>{
 									       	if(res.data.codigo != 0)
-									        	this.nombresdisp = this.nombresdisp.concat(res.data.nombreDisp)
+									        	this.nombresdisp = this.nombresdisp.concat(res.data)
 										})
 
-						            }
+						            }*/
 						            /*
 									 PENDIENTE ORDEN DE LOS CASCOS
 						            */
@@ -131,8 +131,8 @@
 						            	for( i=0; i < this.dispositivos.length; i++ ){
 										//this.variable3="Tamaño datos "+this.datos.length
 											for( j=0; j < this.datos.length; j++ ){
-												if(this.datos[j].IDdisp==this.dispositivos[i]._id)
-													this.datos[j].IDdisp=this.nombresdisp[i]
+												if(this.datos[i].IDdisp==this.dispositivos[j]._id)
+													this.datos[i].IDdisp=this.dispositivos[j].nombreDisp
 											}
 										}
 						            }, 500);

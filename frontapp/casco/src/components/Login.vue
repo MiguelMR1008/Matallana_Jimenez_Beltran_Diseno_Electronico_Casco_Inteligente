@@ -47,6 +47,7 @@
                     if(res.data.codigo == 0){
                         localStorage.tokenSession = res.data.token;
                         localStorage.rolSession = res.data.rol;
+                        localStorage.estadoStreaming = res.data.streaming;
                         this.headers = {
                             'acces-token' : localStorage.tokenSession,
                             'Authorization' : 'JWT fefege...'

@@ -8,26 +8,28 @@
       <!--p v-if="!Number.isNaN(Distancia) ">Distancia aproximada:  {{ Distancia }} Km</p-->
       <!--p v-else>Menos de 700m</p-->
       <h2>{{variable2}}</h2><br>
+      <!--h2>{{topicIDDisp._id}}</h2><br-->
       <!--select name="disp" id="disps">
         <option disabled value="">Seleccione un elemento</option>
         <tr v-for="nombre in nombres">
             <option>{{nombre}}</option>
         </tr>
       </select><br><br-->
-      <h2>Dispositivos</h2>
-      <select v-model="testVal">
-          <option disabled value="">Seleccione un elemento</option>
-          <option v-for="nombre in nombres" :value="nombre">{{nombre}}</option>
+      <h2 v-if= "streaming==1">Dispositivos</h2>
+      <select v-if= "streaming==1" v-model="topicIDDisp">
+          <!--option disabled value="">Seleccione un elemento</option-->
+          <option v-for="dispositivo in dispositivos" :value="dispositivo">{{dispositivo.nombreDisp}}</option>
       </select><br><br>
+      <button v-if= "streaming==1" class="btn btn-primary" type="button" @click="seleccionar(topicIDDisp._id)">Seleccionar</button>
       <!--h2>{{testVal}}</h2><br-->
       <h2 v-if= "streaming==1 && Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
     <h2 v-else-if="streaming==1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
   <h2 v-if="streaming==1">Último registro: {{fecha}} </h2>
       <!--h2>Último registro: 20/04/20 15:30 (Hace 5 minutos)</h2-->
-      <button v-if="estado==1" type="button" class="btn btn-success">Estado: Encendido</button>
+      <button v-if="streaming==1 && estado==1" type="button" class="btn btn-success">Estado: Encendido</button>
       <button v-else type="button" class="btn btn-danger">Estado: Apagado</button>
     </br></br>
-      <button v-if="streaming==1"type="button" class="btn btn-success">Streaming: Encendido</button>
+      <button v-if="streaming==1 && streamingOff==0"type="button" class="btn btn-success">Streaming: Encendido</button>
       <button v-else type="button" class="btn btn-danger">Streaming: Apagado</button>
     </br></br>
       <button v-if= "streaming==1" @click="Miubicacion()">
@@ -94,11 +96,15 @@ export default {
     return {
       variable2: null,
       estado:1,
+      payload: "Holaa",
+      topicIDDisp: [],
+      roomSocket: "nada",
       rol: localStorage.rolSession,
-      streaming:null,
+      streaming: localStorage.estadoStreaming,
+      streamingOff: 0,
       dispositivos : null,
       nombres: [],
-      carros: ["Audi","Chevrolet","BMW","Mazda"],
+      cont: 0,
       correoAsociado: null,
       socket:{}, //Para manejar socketio
       alerta:0,
@@ -202,6 +208,75 @@ export default {
       this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Actualizar linea
       //Aproximacion euclidea sin tomar curvatura tierra
       this.Distancia = Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111;//Recalculo variable distancia        
+    },
+    seleccionar(data){
+        this.roomSocket=data
+        //this.variable2=this.roomSocket
+        this.socket.on(this.roomSocket,data=>{
+        this.payload = data        //-------latitud y longitud---------
+        if(this.cont==3 && localStorage.rolSession==3){
+            const headers = {
+              'acces-token' : localStorage.tokenSession,
+              'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+              telefono : localStorage.telefono,
+              rol : localStorage.rolSession
+            }
+            axios.post('http://localhost:3000/verStreaming',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){                                                   //no se pudo autenticar
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }else{
+                    this.streaming=res.data.codigo
+                }
+            })
+            this.cont=0
+        }
+        this.cont++
+        //console.log('holalatitud')
+        CascoLat=data.sendlat;
+        CascoLong=data.sendlong;
+        this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
+        this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco
+        this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Por algun motivo se invirtieron
+        this.center = [CascoLat,CascoLong]; //Primero long, luego lat
+        //Actualizar ubicacion casco
+
+        //-----------------------------------
+        //----------fecha---------------
+        this.fecha=data.fechita
+        //-----------------------------------
+
+
+        //this.variable2=this.payload
+      })
+    },
+    comprobarStreaming(){
+            const headers = {
+              'acces-token' : localStorage.tokenSession,
+              'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+              telefono : localStorage.telefono,
+              rol : localStorage.rolSession
+            }
+            axios.post('http://localhost:3000/verStreaming',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){                                                   //no se pudo autenticar
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }else{
+                    this.streaming=res.data.codigo
+                }
+                this.cont=0
+            })
+
     }
 
   },//FIn metodos
@@ -214,6 +289,8 @@ export default {
   //},
         created: function(){ //Negar si no tiene el token
 //          var socket = io.connect('http://localhost');
+          //this.topicIDDisp._id="5e962540ef6a6459d46d128a"
+          //this.variable2=this.topicIDDisp._id
           this.socket = io.connect("http://localhost:3001");
           //var socket = io.connect('http://localhost:3001');
           console.log('hola')
@@ -239,13 +316,17 @@ export default {
                   Codigo==2 autenticado, sí es allegado, streaming desactivado
                   Codigo==1 autenticado, no es allegado
                 */         
-                  if(res.data.codigo == 3){         
+                  if(res.data.codigo == 4){         
                     this.variable2=res.data.mensaje
                   }else
                     this.variable2="Usted es allegado de "+res.data.nombreUsuario+" "+res.data.apellidoUsuario
                   this.streaming=res.data.codigo
                 }else{
                   this.streaming=1
+                  if(localStorage.estadoStreaming==1)
+                    this.streamingOff=0
+                  else
+                    this.streamingOff=1
                 }
                 //Consulta dispositivos
                 data = {
@@ -257,7 +338,7 @@ export default {
                 }).then(res =>{
                   if(res.data.codigo != 0){
                         this.dispositivos = res.data
-                        var i
+                        /*var i
                         for( i=0; i < this.dispositivos.length; i++ ){
                           data={
                             IDdisp : this.dispositivos[i]._id
@@ -268,7 +349,7 @@ export default {
                               if(res.data.codigo != 0)
                                 this.nombres = this.nombres.concat(res.data.nombreDisp)
                           })
-                        }
+                        }*/
                         /*setTimeout(() => {
                             this.variable2=this.nombresdisp[0] + "      " + this.nombresdisp[1]
                         }, 5000);*/
@@ -286,20 +367,71 @@ export default {
       alert("Acaba de ocurrir un accidente, favor dirigirse hacia el historial");
       this.alerta=0;
     }
-    //var socket = io.connect('http://localhost:3001');
-var socket = io.connect('localhost:3001');
+    
+    var socket = io.connect('localhost:3001');
       socket.on("msg",data=>{ 
       console.log('holajson')
       console.log(data)
 
     })
+    //this.socket.on("5e962540ef6a6459d46d128a",data=>{
+      //if(this.topicIDDisp._id == null)
      
+    //if(this.topicIDDisp._id == null){
+      //this.cont++
+      //this.variable2=this.cont
+      this.socket.on(this.roomSocket,data=>{
+        this.payload = data
+        this.variable2="Pasó"
+        //-------latitud y longitud---------
+        console.log(data)
+        //console.log('holalatitud')
+        CascoLat=data.sendlat;
+        CascoLong=data.sendlong;
+        this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
+        this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco
+        this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Por algun motivo se invirtieron
+        this.center = [CascoLat,CascoLong]; //Primero long, luego lat
+        //Actualizar ubicacion casco
+
+        //-----------------------------------
+        //----------fecha---------------
+        this.fecha=data.fechita
+        //-----------------------------------
+
+
+        //this.variable2=this.payload
+      })
+    //}
     this.socket.on("msg2",data=>{
       console.log('holajson')
       console.log(data)
       //Actualizar ubicacion casco
+      if(this.cont==2 && localStorage.rolSession==3){
+            const headers = {
+              'acces-token' : localStorage.tokenSession,
+              'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+              telefono : localStorage.telefono,
+              rol : localStorage.rolSession
+            }
+            axios.post('http://localhost:3000/verStreaming',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){                                                   //no se pudo autenticar
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }else{
+                    this.streaming=res.data.codigo
+                }
+            })
+            this.cont=0
+      }
+      this.cont++
     })
-   this.socket.on("sendlat",data=>{
+    this.socket.on("sendlat",data=>{
       console.log(data)
       console.log('holalatitud')
       CascoLat=data;
@@ -319,7 +451,31 @@ var socket = io.connect('localhost:3001');
       this.alerta=data;
     })
 
-  } //Fin mounted
+  }/*, //Fin mounted
+  methods:{
+      comprobarStreaming(){
+            const headers = {
+              'acces-token' : localStorage.tokenSession,
+              'Authorization' : 'JWT fefege...'
+            }
+            var data = {
+              telefono : localStorage.telefono,
+              rol : localStorage.rolSession
+            }
+            axios.post('http://localhost:3000/verStreaming',data,{
+                headers : headers
+            })
+            .then(res =>{
+                if(res.data.codigo == 0){                                                   //no se pudo autenticar
+                    this.$router.push("/")
+                    localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                }else{
+                    this.streaming=res.data.codigo
+                }
+            })
+
+      }
+  }*/
 
 }; //Fin export default
 </script>
