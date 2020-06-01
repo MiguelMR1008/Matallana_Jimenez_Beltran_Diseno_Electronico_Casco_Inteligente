@@ -321,11 +321,31 @@ app.post('/eliminarUsuario', router, (req, res) =>{
 							if(err){
 								console.log("No se pudo eliminar el cliente")
 							}else{
+								query = { correoUsuario : req.decoded.correo}
+								regis = mongoose.model("Dispositivo", esquemaDispositivo);
+								regis.collection.update(query,
+								{
+									"_id": result._id,
+									"nombreDisp": "",
+									"correoUsuario": ""
+								})
 								console.log("Usuario eliminado")
 								res.send({
 									mensaje : "Usuario eliminado correctamente",
 									codigo : 1
 								})
+								/*regis.deleteOne(query, function(err, result){
+									if(err){
+										console.log("No se pudo eliminar el dispositivo")
+									}else{
+										regis = mongoose.model("Cliente", esquemaCliente);
+										console.log("Usuario eliminado")
+										res.send({
+											mensaje : "Usuario eliminado correctamente",
+											codigo : 1
+										})
+									}
+								})*/
 							}
 						})
 					}
@@ -520,26 +540,72 @@ app.post('/registroDispositivo',router, function (req, res){
 	regis = mongoose.model("Dispositivo", esquemaDispositivo); 
 	console.log(req.body)
 	var datos
-	var myData
 	var query = {
-		$and:[
-		{ nombreDisp: req.body.nombreDisp},
-		{ correoUsuario : req.decoded.correo}
-		]
+		_id: req.body.serialDisp
 	}
 	if((req.body.nombreDisp != "" && req.body.nombreDisp != null)){
 		regis.findOne(query, function(err, result){
 			if(err){
 				console.log("Error en la consulta")
-				res.send("Error")
+				res.json({ 
+					mensaje : "El serial no es valido",
+					codigo : 4
+				})
 			}else{
 				console.log("Consulta OK")
 				if(result){
-					res.json({ 
-						mensaje : "El dispositivo ya existe",
-						codigo : 1
-					})
-				}else{
+					if(result.correoUsuario==""){		
+						query = {
+							correoUsuario: ""
+						}
+						regis.collection.update(query,				//No se puede hacer el query en update utilizando la variable _id porque es de tipo ObjectID y paila
+						{
+							//"_id": result._id,
+							"nombreDisp" : req.body.nombreDisp,
+							"correoUsuario" : req.decoded.correo
+						})
+						console.log("Pasó cambio")
+						regis = mongoose.model("Usuarios", esquemaUsuario);
+						var query = {
+						 	correo: req.decoded.correo
+						}
+						regis.findOne(query, function(err, result){
+							if(err){
+								console.log("Error en la consulta")
+							}else{
+								console.log("Consulta OK")
+								if(result){
+									if(result.rol == 3){
+										regis.collection.update(query,
+										{
+											"_id": result._id,
+											"correo": result.correo,
+											"clave": result.clave,
+											"telefono": result.telefono,
+											"fechaRegis": result.fechaRegis,
+											"rol": 2,
+											"streaming": result.streaming,
+										})
+										res.json({ 
+											mensaje : "Registro exitoso y ahora es usuario tipo 2",
+											codigo : 2
+										})
+									}else{
+										res.json({ 
+											mensaje : "Registro exitoso",
+											codigo : 1
+										})
+									}
+								}
+							}
+						})
+					}else{
+						res.json({ 
+							mensaje : "El dispositivo ya se encuentra registrado",
+							codigo : 3
+						})
+					}
+				}/*else{
 					datos = {
 						"nombreDisp" : req.body.nombreDisp,
 						"correoUsuario" : req.decoded.correo
@@ -584,7 +650,7 @@ app.post('/registroDispositivo',router, function (req, res){
 
 
 					
-				}
+				}*/
 			}
 		})
 	}
@@ -635,7 +701,7 @@ app.post('/registroAsociado',router, function (req, res){
 						}else{
 							res.json({ 
 								mensaje : "No existe un usuario asociado a este número de teléfono",
-								codigo : 2
+								codigo : 3
 							})
 						}
 					})
@@ -651,6 +717,7 @@ app.post('/registroAsociado',router, function (req, res){
 
 app.post('/eliminarAllegado', router, (req, res) =>{
 	regis = mongoose.model("Asociado", esquemaAsociado);
+	console.log(req.body)
 	query = { 
 		$and:[
 		{ telAsociado: req.body.telAsociado},
@@ -673,7 +740,7 @@ app.post('/eliminarAllegado', router, (req, res) =>{
 						})
 					}else{
 						res.send({
-							mensaje : "Se ha elimindao el usuario allegado",
+							mensaje : "Se ha eliminado el usuario allegado",
 							codigo : 3
 						})
 					}
@@ -754,6 +821,37 @@ app.post('/streaming', router, function(req, res){
 	})
 });
 
+app.post('/cambiarNomAllegado', router, function(req, res){
+	regis = mongoose.model("Asociado", esquemaAsociado);
+	var query = { 
+		$and:[
+		{ telAsociado: req.body.telAsociado},
+		{ correoUsuario : req.decoded.correo}
+		]
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				regis.collection.update(query,
+					{
+					"_id": result._id,
+					"nombreAsociado": req.body.nuevoNombre,
+					"telAsociado": result.telAsociado,
+					"correoUsuario": result.correoUsuario,
+				})
+				res.json({ 
+					mensaje : "Nombre modificado exitosamente",
+					codigo : 1
+				})
+								
+			}
+		}
+	})
+});
+
 app.post('/verStreaming', router, function(req, res){
 	regis = mongoose.model("Asociado", esquemaAsociado);
 	var stream
@@ -794,6 +892,7 @@ app.post('/verStreaming', router, function(req, res){
 											mensaje : "Es asociado y el streaming está activado",
 											nombreUsuario : nombreUser,
 											apellidoUsuario : apellidoUser,
+											correoUsuario: result.correo,
 											codigo : 1
 										})
 									}else{
@@ -801,6 +900,7 @@ app.post('/verStreaming', router, function(req, res){
 											mensaje : "Es asociado y el streaming está desactivado",
 											nombreUsuario : nombreUser,
 											apellidoUsuario : apellidoUser,
+											correoUsuario: result.correo,
 											codigo : 2
 										})
 									}
@@ -810,10 +910,18 @@ app.post('/verStreaming', router, function(req, res){
 					}
 				})			
 			}else{
-				res.json({ 
-					mensaje : "Usted no está vinculado a ningún usuario",
-					codigo : 3
-				})
+				if(req.body.rol==3){
+					res.json({ 
+						mensaje : "Usted no está vinculado a ningún usuario",
+						codigo : 3
+					})
+				}else{
+					res.json({ 
+						mensaje : "Correo encontrado",
+						correoUsuario: req.decoded.correo,
+						codigo : 3
+					})
+				}
 			}
 		}
 	})
@@ -939,6 +1047,33 @@ app.post('/ultimoDato', function(req, res){
 	  res.json(result);
 	});
 });
+
+//------WEB SERVICES DE ADMIN PANEL--------------------------
+app.post('/crearDispositivo', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Dispositivo", esquemaDispositivo);
+		var datos = {
+			"nombreDisp": null,
+			"correoUsuario": null,
+		}
+		myData= new regis(datos)
+		insertarBD(myData)
+		res.json({
+			mensaje : "Se creó un nuevo dispositivo",
+			codigo : 1
+		})
+	}else{
+		res.json({
+			mensaje : "Acceso denegado",
+			codigo : 2
+		})
+	}
+});
+
+
+//-----------------------------------------------------------
+
 //------------------------------ Version 1 ----------------------------------
 
 /*router.route('/registro').post(function (req, res){
@@ -1038,6 +1173,41 @@ function insertarBD(mydata) {
 		}
 	})
 }
+
+function verificarAdmin(correoUsuario){
+	if(correoUsuario=="jimenez@mail.com" || correoUsuario=="matallana@mail.com")
+		return 1;
+	else
+		return 0;
+}
+
+app.post('/nombreDispositivo', router, function(req, res){
+	regis = mongoose.model("Dispositivo", esquemaDispositivo);
+	console.log(req.body)
+	var query = {
+		_id: req.body.IDdisp
+	}
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				res.json({ 
+					mensaje : "Dispositivo encontrado",
+					nombreDisp : result.nombreDisp,
+					codigo : 1
+				})	
+			}else{
+				res.json({ 
+					mensaje : "No se encontro el dispositivo",
+					codigo : 2
+				})
+			}
+		}
+	})
+});
+
 function getDateTime() {
 	var date = new Date();
 	var hour = date.getHours();

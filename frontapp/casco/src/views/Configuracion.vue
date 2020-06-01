@@ -12,6 +12,7 @@
     <Config />
     <RegistroDispositivo />
     <RegistroAsociado v-if= "rol==1 || rol==2"></RegistroAsociado>
+    <ModificarAllegado v-if= "rol==1 || rol==2"></ModificarAllegado>
     <!--div>
       <h2>Tipo de usuario: </h2>
       <h2 v-if="tipousuario==1"> Administrador</h2>
@@ -56,6 +57,7 @@
 // @ is an alias to /src
 import RegistroDispositivo from '@/components/RegistroDispositivo.vue'
 import RegistroAsociado from '@/components/RegistroAsociado.vue'
+import ModificarAllegado from '@/components/ModificarAllegado.vue'
 import Config from '@/components/Config.vue'
 import Streaming from '@/components/Streaming.vue'
 
@@ -65,6 +67,7 @@ export default {
     RegistroDispositivo,
     Config,
     RegistroAsociado,
+    ModificarAllegado,
     Streaming
   },data(){
     return {

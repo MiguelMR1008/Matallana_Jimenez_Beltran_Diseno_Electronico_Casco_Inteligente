@@ -7,6 +7,8 @@
     <div>{{variable}}</div>
     <div>Nombre</div>
     <input type="text" v-model="nombreDisp" v-on:keyup.13="registrar()"><br><br>
+    <div>Serial dispositivo</div>
+    <input type="text" v-model="serialDisp" v-on:keyup.13="registrar()"><br><br>
     <button type="button" v-on:click="registrar()">Registrar dispositivo</button>
  </div>
 
@@ -20,6 +22,7 @@
             return{
                 variable: null,
                 nombreDisp: null,
+                serialDisp: null,
             };
         },
         created: function(){
@@ -52,7 +55,8 @@
                     'Authorization' : 'JWT fefege...'
                 }
                 var data = {
-                    'nombreDisp' : this.nombreDisp
+                    nombreDisp : this.nombreDisp,
+                    serialDisp : this.serialDisp
                 }
                 axios.post('http://localhost:3000/registroDispositivo', data,{
                     headers : headers

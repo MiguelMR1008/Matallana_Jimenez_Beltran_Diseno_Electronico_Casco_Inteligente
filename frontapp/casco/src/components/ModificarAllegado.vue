@@ -1,6 +1,6 @@
 <template>
  <div class= "modAllegado"><br><br>
-
+ 	<h2>Modificar allegado</h2>
 	<div>{{variable}}</div><br>
 	<!--div>{{esperar}}</div>
 	<h2>{{variable2}}</h2><br>
@@ -9,6 +9,9 @@
  	<!--Mapa 
 	 :recibirCoordenadas="recibirCoordenadas"
 	  @verregistro="Prueba($event)"
+
+
+	  style="width:30%"
 	/-->
 				
 		
@@ -17,16 +20,26 @@
 			<th scope="col">Nombre allegado</th>
 			<th scope="col">Teléfono allegado</th>
 			<th scope="col"> </th>
+			<th scope="col"> </th>
 		</thead>
 		<!--buttonbutton v-on:click="verDato(23)" ></button-->
 		<tbody>
 			<tr v-for="allegado in allegados">
 				<td>{{allegado.nombreAsociado}}</td>
 				<td>{{allegado.telAsociado}}</td>
-				<button class="btn btn-danger" type="button" @click="eliminarAllegado('allegado.telAsociado')">Eliminar</button><br><br>
+				<td>
+				<button class="btn btn-primary" type="button" @click="modificarBoton(allegado.telAsociado)">Modificar</button>
+				</td>
+				<td>
+				<button class="btn btn-danger" type="button" @click="eliminarAllegado(allegado.telAsociado)">Eliminar</button>
+				</td>
 			</tr>
 		</tbody>
 	</table>
+	<h2 v-if="ventanaMod==1">Modificar nombre del usuario del teléfono: {{telefonoMod}}</h2>>
+	<input v-if="ventanaMod==1" type="text" class="form-control" v-model="nombreMod" placeholder="Nuevo nombre"><br>
+	<button v-if="ventanaMod==1" type="button" class="btn btn-primary" v-on:click="modificarNombre()">Guardar cambios</button>
+
 			
 			<!--button @click="$emit('verregistro','hola')">Pasar dato</button-->
  </div>
@@ -38,7 +51,7 @@
 	import {bus} from "../main";
 
 	export default {
-		name: 'modAllegado',
+		name: 'ModAllegado',
 		data(){
 			return{
 				allegados: null,
@@ -53,6 +66,9 @@
 				data: null,
 				headers: null,
 				cont: 0,
+				nombreMod: null,
+				telefonoMod: null,
+				ventanaMod: 0,
 				//Variables mapa
 
 			};
@@ -90,52 +106,49 @@
 		            headers : this.headers
 		        }).then(res =>{
 		        	alert(res.data.mensaje)
+		        	if(res.data.codigo==3)
+		        		window.location.reload()
 		        })
 			},
-			boton(){
-				//this.variable2=this.nombresdisp.length
-				//this.variable2=this.datos.length
-
-				this.variable2=this.nombresdisp[0] + "       " + this.nombresdisp[1]
-				this.variable3=this.dispositivos[0]._id + "      " + this.dispositivos[1]._id
-				/*this.variable2="1"
-				setTimeout(() => { console.log("World!"); }, 2000);
-				this.variable2="2"*/
-				var i
-				var j
-				var cont  = 0
-				var cont2 = 0
-				for( i=0; i < this.dispositivos.length; i++ ){
-					//this.variable3="Tamaño datos "+this.datos.length
-					for( j=0; j < this.datos.length; j++ ){
-						if(this.datos[j].IDdisp==this.dispositivos[i]._id)
-							this.datos[j].IDdisp=this.nombresdisp[i]
-						cont++
-						//this.variable2="Contador dispositivos "+cont
-					}
-					cont2++
-					//this.variable3="Contador dispositivos "+cont2
+			modificarNombre(){
+				this.headers = {
+	                'acces-token' : localStorage.tokenSession,
+	                'Authorization' : 'JWT fefege...'
+	            }
+	            this.data = {
+				    telAsociado : this.telefonoMod,
+				    nuevoNombre : this.nombreMod
 				}
-				/*for( i=0; i < this.dispositivos.length; i++ ){
-				            	this.data={
-				            		IDdisp : this.dispositivos[i]._id
-				            	}
-				            	axios.post('http://localhost:3000/nombreDispositivo',this.data,{
-							        headers : this.headers
-							    }).then(res =>{
-							       	if(res.data.codigo != 0)
-							        	this.nombresdisp[i] = res.data.nombreDisp
-							        this.variable2=this.nombresdisp[i]
-								})
-
-				            }*/
+				axios.post('http://localhost:3000/cambiarNomAllegado',this.data,{
+		            headers : this.headers
+		        }).then(res =>{
+		        	this.variable=res.data.mensaje
+		        	//alert(res.data.mensaje)
+		        	if(res.data.codigo==1)
+		        		setTimeout(() => {
+                            window.location.reload()
+                        }, 5000);
+		        })
+			},
+			modificarBoton(tel){
+				this.telefonoMod=tel
+				this.ventanaMod=1
 			}
 		}
 	}
 </script>
 
 <style>
-	h3 {
-		margin-bottom: 5%;
+    #modAllegado {
+        width: 500px;
+        border: 1px solid #CCCCCC;
+        background-color: #008080;
+        margin: auto;
+        margin-top: 10px;
+        padding: 20px;
+    }
+    table.center {
+	  margin-left: auto;
+	  margin-right: auto;
 	}
-</style>
+</style> 

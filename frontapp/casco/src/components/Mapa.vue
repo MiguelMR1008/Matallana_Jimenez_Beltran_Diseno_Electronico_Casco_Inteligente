@@ -3,8 +3,8 @@
   <div style="height: 500px; width: 100%">
     <div style="height: 200px overflow: auto;">
     
-      <p>Coordenadas casco:  {{ CoordCasco }}</p>
-      <p>Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p>
+      <p v-if="rol==1">Coordenadas casco:  {{ CoordCasco }}</p>
+      <p v-if="rol==1">Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p>
       <!--p v-if="!Number.isNaN(Distancia) ">Distancia aproximada:  {{ Distancia }} Km</p-->
       <!--p v-else>Menos de 700m</p-->
 
@@ -82,6 +82,7 @@ export default {
   data() {
     return {
       variable2: "Inicio Hola",
+      rol: localStorage.rolSession,
       zoom: 13,
       center: latLng(CoordLat , CoordLong),
       //CoordCasco: latLng(4.782904,   -74.044923),

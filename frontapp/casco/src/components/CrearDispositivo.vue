@@ -1,15 +1,11 @@
 <template>
 
- <div id= "registroAso">
+ <div id= "registroDisp">
     <router-view/>
     <!--h3>Registro</h3-->
-    <h2>Registro allegado</h2>
+    <h2>Crear Dispositivo</h2>
     <div>{{variable}}</div>
-    <div>Nombre del allegado</div>
-    <input type="text" v-model="nombreAsociado" ><br><br>
-    <div>Número de teléfono</div>
-    <input type="text" v-model="telAsociado" v-on:keyup.13="registrar()"><br><br>
-    <button type="button" v-on:click="registrar()">Registrar asociado</button>
+    <button type="button" v-on:click="crear()">Crear dispositivo</button>
  </div>
 
 </template>
@@ -17,12 +13,11 @@
 <script>
     import axios from 'axios';
     export default {
-        name: 'RegistroAso',
+        name: 'RegistroDisp',
         data(){
             return{
                 variable: null,
-                nombreAsociado: null,
-                telAsociado: null,
+                nombreDisp: null,
             };
         },
         created: function(){
@@ -43,36 +38,53 @@
                 }
             })
         },
+        /*created: function(){
+            axios.post('http://localhost:3000/consulta').then(res =>{
+                this.users = res.data;
+            })
+        },*/
         methods:{
-            registrar(){
+            crear(){
                 const headers = {
                     'acces-token' : localStorage.tokenSession,
                     'Authorization' : 'JWT fefege...'
                 }
                 var data = {
-                    'nombreAsociado' : this.nombreAsociado,
-                    'telAsociado' : this.telAsociado
-
+                    req : " "
                 }
-                axios.post('http://localhost:3000/registroAsociado', data,{
+                axios.post('http://localhost:3000/crearDispositivo', data,{
                     headers : headers
                 })
                 .then(res =>{
+                    alert(res.data.mensaje)
                     this.variable=res.data.mensaje
-                    //alert(res.data.mensaje)
-                    if(res.data.codigo==2){
-                        setTimeout(() => {
-                            window.location.reload()
-                        }, 5000);
-                    }
                 })
+                /*const headers = {
+                    'Content-Type' : 'application/json',
+                    'Authorization' : 'JWT fefege...'
+                }
+                //this.variable = headers;
+                var data = {
+                    'correo' : this.correo,
+                    'clave' : this.clave
+                }
+                axios.post('http://localhost:3000/autenticar', data,{
+                    headers : headers
+                })
+                .then(res =>{
+                    this.token = res.data.token;
+                    if(this.token != null)
+                        this.$router.push("/about")
+                    else
+                        this.variable="El usuario o contraseña no son correctos"
+                })*/
             }
         }
     }
 </script>
 
 <style>
-    #registroAso {
+    #registroDisp {
         width: 500px;
         border: 1px solid #CCCCCC;
         background-color: #008080;

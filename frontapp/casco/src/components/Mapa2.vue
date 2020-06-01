@@ -3,11 +3,23 @@
   <div style="height: 500px; width: 100%">
     <div style="height: 200px overflow: auto;">
     
-      <p v-if="streaming==1">Coordenadas casco:  {{ CoordCasco }}</p>
-      <p v-if="streaming==1">Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p><br>
+      <p v-if="streaming==1 && rol==1">Coordenadas casco:  {{ CoordCasco }}</p>
+      <p v-if="streaming==1 && rol==1">Posicion centro: {{ currentCenter }} , el zoom es: {{ currentZoom }}</p><br>
       <!--p v-if="!Number.isNaN(Distancia) ">Distancia aproximada:  {{ Distancia }} Km</p-->
       <!--p v-else>Menos de 700m</p-->
-      <h2>{{variable2}}</h2><br><br>
+      <h2>{{variable2}}</h2><br>
+      <!--select name="disp" id="disps">
+        <option disabled value="">Seleccione un elemento</option>
+        <tr v-for="nombre in nombres">
+            <option>{{nombre}}</option>
+        </tr>
+      </select><br><br-->
+      <h2>Dispositivos</h2>
+      <select v-model="testVal">
+          <option disabled value="">Seleccione un elemento</option>
+          <option v-for="nombre in nombres" :value="nombre">{{nombre}}</option>
+      </select><br><br>
+      <!--h2>{{testVal}}</h2><br-->
       <h2 v-if= "streaming==1 && Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
     <h2 v-else-if="streaming==1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
   <h2 v-if="streaming==1">Último registro: {{fecha}} </h2>
@@ -82,7 +94,12 @@ export default {
     return {
       variable2: null,
       estado:1,
+      rol: localStorage.rolSession,
       streaming:null,
+      dispositivos : null,
+      nombres: [],
+      carros: ["Audi","Chevrolet","BMW","Mazda"],
+      correoAsociado: null,
       socket:{}, //Para manejar socketio
       alerta:0,
       contador: "",
@@ -205,7 +222,8 @@ export default {
                 'Authorization' : 'JWT fefege...'
             }
             var data = {
-                telefono : localStorage.telefono
+                telefono : localStorage.telefono,
+                rol : localStorage.rolSession
             }
             axios.post('http://localhost:3000/verStreaming',data,{
                 headers : headers
@@ -229,6 +247,37 @@ export default {
                 }else{
                   this.streaming=1
                 }
+                //Consulta dispositivos
+                data = {
+                    correoUsuario : res.data.correoUsuario,
+                    rol : localStorage.rolSession
+                }
+                axios.post('http://localhost:3000/consultaDispositivos',data,{
+                    headers : headers
+                }).then(res =>{
+                  if(res.data.codigo != 0){
+                        this.dispositivos = res.data
+                        var i
+                        for( i=0; i < this.dispositivos.length; i++ ){
+                          data={
+                            IDdisp : this.dispositivos[i]._id
+                          }
+                          axios.post('http://localhost:3000/nombreDispositivo',data,{
+                          headers : headers
+                          }).then(res =>{
+                              if(res.data.codigo != 0)
+                                this.nombres = this.nombres.concat(res.data.nombreDisp)
+                          })
+                        }
+                        /*setTimeout(() => {
+                            this.variable2=this.nombresdisp[0] + "      " + this.nombresdisp[1]
+                        }, 5000);*/
+                        
+                  }else{
+                    this.$router.push("/")
+                  localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
+                  }
+                })
                 
             })
         },
