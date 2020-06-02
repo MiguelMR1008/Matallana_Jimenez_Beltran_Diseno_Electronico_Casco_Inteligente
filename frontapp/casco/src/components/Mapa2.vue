@@ -22,8 +22,8 @@
       </select><br><br>
       <button v-if= "streaming==1" class="btn btn-primary" type="button" @click="seleccionar(topicIDDisp._id)">Seleccionar</button>
       <!--h2>{{testVal}}</h2><br-->
-      <h2 v-if= "streaming==1 && Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111>=1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111}} Km</h2>
-    <h2 v-else-if="streaming==1"> Distancia: {{Math.sqrt(Math.pow(Math.abs(caslongsum-milongsum),2)+Math.pow(Math.abs(caslatsum-milatsum),2))*111*1000}} M </h2>    
+      <h2 v-if= "streaming==1 && Distancia>=1"> Distancia: {{Distancia}} Km</h2>
+    <h2 v-else-if="streaming==1"> Distancia: {{Distancia}} M </h2>    
   <h2 v-if="streaming==1">Último registro: {{fecha}} </h2>
       <!--h2>Último registro: 20/04/20 15:30 (Hace 5 minutos)</h2-->
       <button v-if="streaming==1 && estado==1" type="button" class="btn btn-success">Estado: Encendido</button>
@@ -232,26 +232,48 @@ export default {
                     localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
                 }else{
                     this.streaming=res.data.codigo
+                    CascoLat=this.payload.latitud;
+                    CascoLong=this.payload.longitud;
+                    this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
+                    this.Distancia=Math.sqrt(Math.pow(Math.abs(CoordLat-CascoLat), 2)-Math.pow(Math.abs(CoordLong-CascoLong), 2))*111.1
+                    this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco
+                    this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Por algun motivo se invirtieron
+                    this.center = [CascoLat,CascoLong]; //Primero long, luego lat
+                    //Actualizar ubicacion casco
+
+                    //-----------------------------------
+                    //----------fecha---------------
+                    this.fecha=this.payload.fechaRegis
+                    //-----------------------------------
+                    if(this.payload.accidente=="1"){
+                      alert("Se ha generado un accidente :(. Será redirigido a la sección de registros para mayor información")
+                      this.$router.push("/data")
+                    }
                 }
             })
             //this.cont=0
         }
+        else{
         //this.cont++
         //console.log('holalatitud')
-        CascoLat=data.sendlat;
-        CascoLong=data.sendlong;
+        CascoLat=data.latitud;
+        CascoLong=data.longitud;
         this.MisCoordenadas = [CoordLat,CoordLong]; //Tambien toca actualizar asi
         this.CoordCasco = [CascoLat,CascoLong];//Actualizo marcador coordenadas casco
+        this.Distancia=Math.sqrt(Math.pow(Math.abs(CoordLat-CascoLat), 2)-Math.pow(Math.abs(CoordLong-CascoLong), 2))*111.1
         this.polygon.latlngs = [[CoordLat, CoordLong], [CascoLat, CascoLong]];//Por algun motivo se invirtieron
         this.center = [CascoLat,CascoLong]; //Primero long, luego lat
         //Actualizar ubicacion casco
 
         //-----------------------------------
         //----------fecha---------------
-        this.fecha=data.fechita
+        this.fecha=data.fechaRegis
         //-----------------------------------
-
-
+        if(data.accidente=="1"){
+          alert("Se ha generado un accidente :(. Será redirigido a la sección de registros para mayor información")
+          this.$router.push("/data")
+        }
+        }
         //this.variable2=this.payload
       })
     },

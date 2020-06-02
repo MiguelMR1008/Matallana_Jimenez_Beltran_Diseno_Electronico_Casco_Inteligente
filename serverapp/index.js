@@ -13,6 +13,8 @@ var HTTP = require('http').Server(express)
 var io = require('socket.io')(HTTP) //libreria http server express
 
 var mongoose = require('mongoose');
+var mqtt = require('mqtt');
+
 crypto = require('crypto');
 
 var connectionstring = 'mongodb+srv://miguel:casco2020@cluster0-las5s.mongodb.net/cascointeligentedb';
@@ -28,153 +30,95 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 //app.use('/', router);
-///Inicio socket io
-HTTP.listen(3001,()=>{
-	console.log("Socket io escuchando")
-});
+
 var arreglo = []
 var contador = 0;
 var lati=4.691918;
 var longi=-74.062958;
 var fech = getDateTime();
-////////variables socketio
-io.on('connection',(socket)=>{
-	console.log("Nuevo cliente")
-	socket.emit('msg','hola desde node'+getDateTime())
-	arreglo.push(socket);
 
-	socket.on('incremento',(counter)=>{
-		console.log('Msg from socket io incremento'+counter)
+///Inicio MQTT+Socketio
 
-	})
-	socket.on('decremento',(counter)=>{
-		console.log('Msg from socket io decremento'+counter)
-	})
+HTTP.listen(3001,()=>{
+	console.log("Socket io escuchando")
+});
 
-	socket.on('disconnect',(reason)=>{
-		var i = arreglo.indexOf(socket)
-		if(i != -1){
-			console.log('Socket desconectado')
-			arreglo.splice(i,1)
-		}
-	})
+var client = mqtt.connect("mqtt://ioticos.org", {
+    clientID: "CascosBuddy",
+    username: 'NVgHV2YJyAdtZo8',
+    password: 'mzeMH901DQRjn9O',
+    clean: true
 })
 
-////////////////INICIO MQTT
-var mqtt = require("mqtt")
+var casco_topic = '5stzM7DxxnzJ7JO/cascoInteligente/datos'
 
-var client = mqtt.connect("mqtt://ioticos.org",{
-	clientId : "Casco1",
-	username: "QAU363T02xoXQBk", //Miguel
-	password: "1EBGBSBG22Kip55", //Miguel
-	//username: "NVgHV2YJyAdtZo8", //alvaro
-	///password: "mzeMH901DQRjn9O", //alvaro
-	clean: true
-});
-
-var fabrica_topic = "5stzM7DxxnzJ7JO/fabrica/coord";
-//var contador_topic = "5stzM7DxxnzJ7JO/fabrica/nodecontador";
-
-client.on("connect",function(connack){
-	console.log("Conectado a MQTT")
-	console.log(connack)
-	client.subscribe(fabrica_topic, function(err){
-		if(!err){
-			console.log("subscribed")
-		}
-		});
-});
-client.on("message",function(topic,message){ //Escuchar ioticos
-	console.log("topic")
-	console.log(topic)
-	console.log("mensaje: ")
-	console.log(message)
-	console.log(message.toString());
-	//Enviar el mensaje al frontapp
-	app.post('/mapa', function(req, res){//Enviar a la pestaña mapa
-
-
-	/*if(datos==palabra)
-		res.send("Son iguales "+datos)
-	else
-		res.send("Error")*/
-});
+client.on('connect', function(connack){
+    console.log('Conectado a MQTT')
+    console.log(connack)
+ 
+    client.subscribe(casco_topic, function(err){
+        if(!err){
+            console.log('Subscribed')
+        }
+    })
+})
+ 
+client.on('error', function(err){
+    console.log(err)
 })
 
-function intervalFunc(){
-	/*
-	if(client.connected == true){
-		var op={
-			retain: false,
-			qos: 0
-		};
-		client.publish(contador_topic, "Test message node",op)
-	}
-	*/
-}
-	var cascopayload = {
-		"long" : "4",
-		"lat=" : "74",
-		"bateria": "85.6",
-		"iddispo" : "7468243e",
-		"fecha" :getDateTime()
-	}
-	//res.send(cascopayload)
-var contador = 0;
-var lati=4.691918;
-var longi=-74.062958;
-var lati2=6.2518400;
-var longi2=-75.5635900;
+var dispo= "";//Para el room del socketio
+
 var fech = getDateTime();
+client.on('message', function(topic, message){
+    console.log('topic')
+    console.log(topic)
+    console.log('mensaje: ')
+    console.log(message.toString())
+    if(topic == '5stzM7DxxnzJ7JO/cascoInteligente/datos'){
+        var texto = message.toString()
+        var payload_l = JSON.parse(texto) //JSON separado
 
-function envio_sio(){
-//	if(flag==1){
-			//JSON.stringify(cascopayload) para enviarlo asi
-			//io.emit('msg2','cuenta: '+ contador++ +JSON.stringify(cascopayload) );
-			contador++;
-			if(contador>=5){
-				//io.emit('alarma',1);
-				contador=0;
-			}
-			if(lati>5.1){
-				lati=4.5
-			}
-			if(lati2>7){
-				lati2=6
-			}
-			lati=lati+0.002
-			lati2=lati2+0.002
-			fech = getDateTime()
-			console.log(fech)
-			var data ={
-				'idDisp':"5e962540ef6a6459d46d128a",
-				'sendlat':lati,
-				'sendlong':longi,
-				'fechita':fech,
-				'accidente':0,
-				'estadoDisp':1
-			}
-			io.emit('5e962540ef6a6459d46d128a',data)
-			var data2 ={
-				'idDisp':"5e9f6a4c1eb5f23a2c8861d6",
-				'sendlat':lati2,
-				'sendlong':longi2,
-				'fechita':fech,
-				'accidente':0,
-				'estadoDisp':1
-			}
-			io.emit('5e9f6a4c1eb5f23a2c8861d6',data2)
-			/*io.emit('sendlat',+lati)
-			io.emit('fechita',''+ fech)
-			io.emit('sendlong',+longi)*/
-			
-	//	}
-}
-////Fin io
-setInterval(envio_sio,7000)
-//setInterval(intervalFunc,7500);
 
-////////////Fin MQTT
+        var datos = { //Registro accidente
+            "IDdisp": payload_l.IDdisp,
+            "intensidadGolpe": payload_l.intensidadGolpe,
+            "latitud": payload_l.latitud,
+            "longitud": payload_l.longitud,
+            "nivelBateria": payload_l.nivelBateria,
+            "fechaRegis": getDateTime()
+        }
+        var datos2 = { //Registro streaming
+            "IDdisp": payload_l.IDdisp,
+            "latitud": payload_l.latitud,
+            "longitud": payload_l.longitud,
+            "nivelBateria": payload_l.nivelBateria,
+            "estadoDisp" : payload_l.estadoDisp,
+            "accidente" : payload_l.accidente, //Para alerta front
+            "fechaRegis": getDateTime()        
+        }
+
+
+        if(payload_l.accidente=="1"){ //Si hubo un accidente
+            //Guardar en BD
+            regis = mongoose.model("Registro", esquemaRegistro);
+            myData= new regis(datos)
+            insertarBD(myData)
+        }
+        //Siempre manda info x socketio
+        io.emit("5e962540ef6a6459d46d128a",datos2)
+        console.log("Estes es el ID: "+payload_l.IDdisp)
+        console.log(datos2)
+        /*res.json({ 
+            mensaje : "Registro exitoso",
+            codigo : 0
+        })*/
+    }else{
+        console.log(message.toString())
+    }
+})
+///Fin MQTT+Socketio
+
 //middleware
 router.use(function (req, res, next) {
 	const token = req.headers['acces-token']; //Prueba postman
@@ -198,6 +142,12 @@ router.use(function (req, res, next) {
 		});
 	}
 });
+
+
+
+//***************************************************************
+//***************************************************************
+//***************************************************************
 
 app.get('/', function(req, res){
 	res.json({ message : 'entrada' });
@@ -516,7 +466,7 @@ app.post('/consultaDatos', router, function(req, res){
 	var query = {
 		IDdisp: datos.IDdisp
 	}
-	regis.find(query, function(err, result){
+	regis.find(query).sort({"fechaRegis": -1}).exec(function(err, result){
 		if(err){
 			console.log("Error en la consulta")
 			res.send("Error")
