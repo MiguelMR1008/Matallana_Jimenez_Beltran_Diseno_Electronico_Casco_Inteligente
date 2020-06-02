@@ -1,37 +1,27 @@
 <template>
- <div class= "adminUsuarios"><br><br>
- 	<h2>Usuarios de la Base de Datos</h2><br>
- 	<h2>Existen {{usuarios.length}} usuarios</h2><br>
-	<h2>Administradores: {{contRol1}} usuarios</h2>
-	<h2> Dueños de casco: {{contRol2}} usuarios</h2>
-	<h2> Allegados: {{contRol3}} usuarios</h2><br>
+ <div class= "adminAllegados"><br><br>
+ 	<h2>Allegados de la Base de Datos</h2><br>
+ 	<h2>Existen {{allegados.length}} allegados asociados</h2><br>
 	<button v-if="verTabla==0" type="button" class="btn btn-primary" v-on:click="estadoTabla()">Ver Tabla</button>
 	<button v-else type="button" class="btn btn-primary" v-on:click="estadoTabla()">Esconder Tabla</button>
 	<br><br>
 	<table v-if="verTabla==1" class="table table-dark">
 		<thead class="thead-dark">
-			<th scope="col">Nombre</th>
-			<th scope="col">Apellido</th>
-			<th scope="col">Correo</th>
-			<th scope="col">Teléfono</th>
-			<th scope="col">Fecha de registro</th>
-			<th scope="col">Tipo de usuario</th>
+			<th scope="col">Nombre asignado</th>
+			<th scope="col">Teléfono allegado</th>
+			<th scope="col">Correo dueño del casco</th>
 			<th scope="col">Eliminar</th>
 		</thead>
 		<tbody>
-			<tr v-for="usuario in usuarios">
-				<td>{{usuario.nombre}}</td>
-				<td>{{usuario.apellido}}</td>
-				<td>{{usuario.correo}}</td>
-				<td>{{usuario.telefono}}</td>
-				<td>{{usuario.fechaRegis}}</td>
-				<td v-if="usuario.rol==1">Administrador</td>
-				<td v-else-if="usuario.rol==2">Dueño casco</td>
-				<td v-else>Allegado</td>
-				<button v-if="usuario.rol != 1" class="btn btn-danger" type="button" @click="eliminarUsuario(usuario.correo)">Eliminar</button>
+			<tr v-for="allegado in allegados">
+				<td>{{allegado.nombreAsociado}}</td>
+				<td>{{allegado.telAsociado}}</td>
+				<td>{{allegado.correoUsuario}}</td>
+				<button class="btn btn-danger" type="button" @click="eliminarAllegado(allegado.correoUsuario,allegado.nombreAsociado)">Eliminar</button>
 			</tr>
 		</tbody>
 	</table>
+			
 			<!--button @click="$emit('verregistro','hola')">Pasar dato</button-->
  </div>
 
@@ -41,11 +31,10 @@
 	import axios from 'axios';
 
 	export default {
-		name: 'adminUsuarios',
+		name: 'adminAllegados',
 		data(){
 			return{
-				usuarios: null,
-				clientes: null,
+				allegados: null,
 				nombresdisp: [],
 				verTabla: 0,
 				datos: [],
@@ -76,31 +65,11 @@
 	        		this.data = {
 				        req : " "
 				    }
-	        		axios.post('http://localhost:3000/adminVerUsuarios',this.data,{
+	        		axios.post('http://localhost:3000/adminVerAllegados',this.data,{
 		                headers : this.headers
 		            }).then(res =>{
 		            	if(res.data.codigo != 0){
-		            		this.usuarios = res.data
-		            		axios.post('http://localhost:3000/adminVerClientes',this.data,{
-				                headers : this.headers
-				            }).then(res =>{
-				            	if(res.data.codigo != 0){
-				            		this.clientes = res.data
-				            		var i
-				            		for(i=0; i < this.usuarios.length; i++){
-				            			if(this.usuarios[i].rol==1)
-				            				this.contRol1++
-				            			else if(this.usuarios[i].rol==2)
-				            				this.contRol2++
-				            			else
-				            				this.contRol3++
-				            		}
-				            		for(i=0; i < this.usuarios.length; i++){
-				            			this.usuarios[i].nombre=this.clientes[i].nombre
-				            			this.usuarios[i].apellido=this.clientes[i].apellido
-				            		}
-				            	}
-							})
+		            		this.allegados = res.data
 		            	}else{
 		            		this.$router.push("/")
       						localStorage.estadoSesion = "Usuario no autenticado. Inicie sesión";
@@ -108,15 +77,16 @@
 					})
 		},
 		methods:{
-			eliminarUsuario(correo){
+			eliminarAllegado(correo, nombre){
 				this.headers = {
 	                'acces-token' : localStorage.tokenSession,
 	                'Authorization' : 'JWT fefege...'
 	            }
 	            this.data = {
-				    correoUsuario : correo
+				    correoUsuario : correo,
+				    nombreAllegado : nombre
 				}
-				axios.post('http://localhost:3000/adminEliminarUsuario',this.data,{
+				axios.post('http://localhost:3000/adminEliminarAllegado',this.data,{
 		            headers : this.headers
 		        }).then(res =>{
 		        	alert(res.data.mensaje)
@@ -159,7 +129,7 @@
 </script>
 
 <style>
-    #adminUsuarios {
+    #adminAllegados {
         width: 500px;
         border: 1px solid #CCCCCC;
         background-color: #008080;

@@ -106,7 +106,7 @@ client.on('message', function(topic, message){
             insertarBD(myData)
         }
         //Siempre manda info x socketio
-        io.emit("5e962540ef6a6459d46d128a",datos2)
+        io.emit(payload_l.IDdisp,datos2)
         console.log("Estes es el ID: "+payload_l.IDdisp)
         console.log(datos2)
         /*res.json({ 
@@ -306,8 +306,8 @@ app.post('/eliminarUsuario', router, (req, res) =>{
 										regis.collection.update(query,
 										{
 											"_id": result._id,
-											"nombreDisp": "",
-											"correoUsuario": ""
+											"nombreDisp": " ",
+											"correoUsuario": " "
 										})
 										console.log("Usuario eliminado")
 										res.send({
@@ -1044,8 +1044,8 @@ app.post('/adminCrearDispositivo', router, function(req, res){
 	if(permiso==1){
 		regis = mongoose.model("Dispositivo", esquemaDispositivo);
 		var datos = {
-			"nombreDisp": "",
-			"correoUsuario": "",
+			"nombreDisp": " ",
+			"correoUsuario": " ",
 		}
 		myData= new regis(datos)
 		insertarBD(myData)
@@ -1058,6 +1058,146 @@ app.post('/adminCrearDispositivo', router, function(req, res){
 			mensaje : "Acceso denegado",
 			codigo : 2
 		})
+	}
+});
+
+app.post('/adminEliminarUsuario', router, (req, res) =>{
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+	regis = mongoose.model("Usuarios", esquemaUsuario);
+	query = { correo : req.body.correoUsuario}
+	console.log(req.decoded.correo)
+	regis.findOne(query, function(err, result){
+		if(err){
+			console.log("Error en la consulta")
+			res.send("Error")
+		}else{
+			console.log("Consulta OK")
+			if(result){
+				regis.deleteOne(query, function(err, result){
+					if(err){
+						console.log("No se pudo eliminar el usuario")
+						res.send({
+							mensaje : "Error. No se pudo eliminar el usuario",
+							codigo : 2
+						})
+					}else{
+						regis = mongoose.model("Cliente", esquemaCliente);
+						regis.deleteOne(query, function(err, result){
+							if(err){
+								console.log("No se pudo eliminar el cliente")
+							}else{
+								query = { correoUsuario : req.body.correoUsuario}
+								regis = mongoose.model("Dispositivo", esquemaDispositivo);
+								regis.findOne(query, function(err, result){
+									if(err){
+										console.log("No se pudó eliminar el dispositivo")
+										res.send("Error")
+									}else{
+										if(result){
+										regis.collection.update(query,
+										{
+											"_id": result._id,
+											"nombreDisp": " ",
+											"correoUsuario": " "
+										})
+										}
+										console.log("Usuario eliminado")
+										res.send({
+											mensaje : "Usuario eliminado correctamente",
+											codigo : 1
+										})
+									}
+								})
+								
+								/*regis.deleteOne(query, function(err, result){
+									if(err){
+										console.log("No se pudo eliminar el dispositivo")
+									}else{
+										regis = mongoose.model("Cliente", esquemaCliente);
+										console.log("Usuario eliminado")
+										res.send({
+											mensaje : "Usuario eliminado correctamente",
+											codigo : 1
+										})
+									}
+								})*/
+							}
+						})
+					}
+				})
+			}else{
+				res.json({ 
+					mensaje : "El usuario no existe"
+				})
+			}
+		}
+	})
+	}
+});
+
+app.post('/adminEliminarDispositivo', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Dispositivo", esquemaDispositivo);
+		query = { _id : req.body.IDdisp}
+		regis.findOne(query, function(err, result){
+			if(err){
+				console.log("Error en la consulta")
+				res.send("Error")
+			}else{
+				if(result){
+					regis.deleteOne(query, function(err, result){
+						if(err){
+							console.log("No se pudo eliminar el dispositivo")
+						}else{
+							if(result){
+								console.log("Dispositivo eliminado")
+								res.send({
+									mensaje : "Dispositivo eliminado correctamente",
+									codigo : 1
+								})
+							}
+						}
+					})
+				}
+			}
+		});
+	}
+});
+
+app.post('/adminEliminarAllegado', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Asociado", esquemaAsociado);
+		query = {
+			$and:[
+			{nombreAsociado : req.body.nombreAllegado},
+			{correoUsuario : req.body.correoUsuario}
+			]
+		}
+		regis.findOne(query, function(err, result){
+			if(err){
+				console.log("Error en la consulta")
+				res.send("Error")
+			}else{
+				if(result){
+					regis.deleteOne(query, function(err, result){
+						if(err){
+							console.log("No se pudo eliminar el allegado")
+						}else{
+							if(result){
+								console.log("Allegado eliminado")
+								res.send({
+									mensaje : "Allegado eliminado correctamente",
+									codigo : 1
+								})
+							}
+						}
+					})
+				}
+			}
+		});
 	}
 });
 

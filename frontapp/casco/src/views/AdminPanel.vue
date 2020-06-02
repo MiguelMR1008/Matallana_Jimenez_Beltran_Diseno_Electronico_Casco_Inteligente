@@ -8,8 +8,10 @@
     </div>
     </div>
     <h1>Admin Panel</h1>
-    <CrearDispositivo />
+    <AdminCrearDispositivo />
     <AdminUsuariosInfo />
+    <AdminDispositivosInfo />
+    <AdminAllegadosInfo />
 
   </div>
 </template>
@@ -17,14 +19,17 @@
 <script>
 // @ is an alias to /src
 import AdminUsuariosInfo from '@/components/AdminUsuariosInfo.vue'
-import CrearDispositivo from '@/components/CrearDispositivo.vue'
-import Streaming from '@/components/Streaming.vue'
+import AdminDispositivosInfo from '@/components/AdminDispositivosInfo.vue'
+import AdminCrearDispositivo from '@/components/AdminCrearDispositivo.vue'
+import AdminAllegadosInfo from '@/components/AdminAllegadosInfo.vue'
 
 export default {
   name: 'AdminPanel',
   components: {
     AdminUsuariosInfo,
-    CrearDispositivo
+    AdminAllegadosInfo,
+    AdminDispositivosInfo,
+    AdminCrearDispositivo
   },data(){
     return {
       rol:localStorage.rolSession,

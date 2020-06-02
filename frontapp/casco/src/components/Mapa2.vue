@@ -17,10 +17,10 @@
       </select><br><br-->
       <h2 v-if= "streaming==1">Dispositivos</h2>
       <select v-if= "streaming==1" v-model="topicIDDisp">
-          <!--option disabled value="">Seleccione un elemento</option-->
+          <option disabled value="">Seleccione un dispositivo</option>
           <option v-for="dispositivo in dispositivos" :value="dispositivo">{{dispositivo.nombreDisp}}</option>
       </select><br><br>
-      <button v-if= "streaming==1" class="btn btn-primary" type="button" @click="seleccionar(topicIDDisp._id)">Seleccionar</button>
+      <button v-if= "streaming==1" class="btn btn-primary" type="button" @click="seleccionar(topicIDDisp._id)">Seleccionar</button><br><br>
       <!--h2>{{testVal}}</h2><br-->
       <h2 v-if= "streaming==1 && Distancia>=1"> Distancia: {{Distancia}} Km</h2>
     <h2 v-else-if="streaming==1"> Distancia: {{Distancia}} M </h2>    

@@ -66,6 +66,9 @@
                     if(res.data.codigo == 2){
                         this.variable=res.data.mensaje
                         localStorage.rolSession=2
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 3000);
                     }else
                         this.variable=res.data.mensaje
                 })
