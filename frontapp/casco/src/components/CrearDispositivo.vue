@@ -1,6 +1,6 @@
 <template>
 
- <div id= "registroDisp">
+ <div id= "crearDisp">
     <router-view/>
     <!--h3>Registro</h3-->
     <h2>Crear Dispositivo</h2>
@@ -13,7 +13,7 @@
 <script>
     import axios from 'axios';
     export default {
-        name: 'RegistroDisp',
+        name: 'crearDisp',
         data(){
             return{
                 variable: null,
@@ -84,7 +84,7 @@
 </script>
 
 <style>
-    #registroDisp {
+    #crearDisp {
         width: 500px;
         border: 1px solid #CCCCCC;
         background-color: #008080;

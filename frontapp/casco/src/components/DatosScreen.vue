@@ -128,14 +128,16 @@
 									 PENDIENTE ORDEN DE LOS CASCOS
 						            */
 						            setTimeout(() => {
-						            	for( i=0; i < this.dispositivos.length; i++ ){
+						            	for( i=0; i < this.datos.length; i++ ){
 										//this.variable3="Tamaño datos "+this.datos.length
-											for( j=0; j < this.datos.length; j++ ){
-												if(this.datos[i].IDdisp==this.dispositivos[j]._id)
+											for( j=0; j < this.dispositivos.length; j++ ){
+												if(this.datos[i].IDdisp==this.dispositivos[j]._id){
 													this.datos[i].IDdisp=this.dispositivos[j].nombreDisp
+													break
+												}
 											}
 										}
-						            }, 500);
+						            }, 1000);
 
 				            	}else{
 				            		this.$router.push("/")
@@ -156,7 +158,6 @@
 
 		            		this.dispositivos = res.data
 		            		var i
-				            var j
 		            		for( i=0; i < this.dispositivos.length; i++){
 		            			this.cont=this.cont+1;
 		            			this.data={
@@ -171,7 +172,7 @@
 					            	
 								})
 		            		}
-		            		for( i=0; i < this.dispositivos.length; i++ ){
+		            		/*for( i=0; i < this.dispositivos.length; i++ ){
 				            	this.data={
 				            		IDdisp : this.dispositivos[i]._id
 				            	}
@@ -182,19 +183,23 @@
 							        	this.nombresdisp = this.nombresdisp.concat(res.data.nombreDisp)
 								})
 
-				            }
+				            }*/
 				            /*
 							 PENDIENTE ORDEN DE LOS CASCOS
 				            */
 				            setTimeout(() => {
-				            	for( i=0; i < this.dispositivos.length; i++ ){
+				            	var k
+				            	var j
+				            	for( k=0; k < this.datos.length; k++ ){
 								//this.variable3="Tamaño datos "+this.datos.length
-									for( j=0; j < this.datos.length; j++ ){
-										if(this.datos[j].IDdisp==this.dispositivos[i]._id)
-											this.datos[j].IDdisp=this.nombresdisp[i]
+									for( j=0; j < this.dispositivos.length; j++ ){
+										if(this.datos[k].IDdisp==this.dispositivos[j]._id){
+											this.datos[k].IDdisp=this.dispositivos[j].nombreDisp
+											break
+										}
 									}
 								}
-				            }, 500);
+				            }, 1000);
 
 		            	}else{
 		            		this.$router.push("/")

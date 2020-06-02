@@ -7,6 +7,8 @@ import Configuracion from '../views/Configuracion.vue'
 import Datos from '../views/Datos.vue'
 import MapaVista from '../views/MapaVista.vue'
 import Estadodis from '../views/Estadodis.vue'
+import AdminPanel from '../views/AdminPanel.vue'
+
 Vue.use(VueRouter)
 
   const routes = [
@@ -39,6 +41,11 @@ Vue.use(VueRouter)
     path: '/mapa',
     name: 'MapaVista',
     component: MapaVista
+  },
+  {
+    path: '/adminPanel',
+    name: 'AdminPanel',
+    component: AdminPanel
   },
   {
     path: '/estadodis',

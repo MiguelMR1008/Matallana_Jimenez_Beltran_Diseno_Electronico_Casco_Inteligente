@@ -214,7 +214,7 @@ export default {
         //this.variable2=this.roomSocket
         this.socket.on(this.roomSocket,data=>{
         this.payload = data        //-------latitud y longitud---------
-        if(this.cont==3 && localStorage.rolSession==3){
+        if(localStorage.rolSession==3){
             const headers = {
               'acces-token' : localStorage.tokenSession,
               'Authorization' : 'JWT fefege...'
@@ -234,9 +234,9 @@ export default {
                     this.streaming=res.data.codigo
                 }
             })
-            this.cont=0
+            //this.cont=0
         }
-        this.cont++
+        //this.cont++
         //console.log('holalatitud')
         CascoLat=data.sendlat;
         CascoLong=data.sendlong;

@@ -57,6 +57,9 @@
 		methods:{
 			login(){
 			},
+			goAdminPanel(){
+				this.$router.push("/adminPanel")
+			},
 			goMapa(){
 				this.$router.push("/mapa")
 			},

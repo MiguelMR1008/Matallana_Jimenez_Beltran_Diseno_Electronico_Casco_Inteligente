@@ -47,7 +47,7 @@
       <l-marker   :lat-lng="CoordCasco">
         <l-tooltip :options="{ permanent: true, interactive: true }">
           <div>
-            Ubicacion actual casco
+            Ubicacion del casco
           </div>
         </l-tooltip>
       </l-marker>

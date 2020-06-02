@@ -171,7 +171,7 @@ function envio_sio(){
 	//	}
 }
 ////Fin io
-setInterval(envio_sio,3000)
+setInterval(envio_sio,7000)
 //setInterval(intervalFunc,7500);
 
 ////////////Fin MQTT
@@ -1089,7 +1089,7 @@ app.post('/ultimoDato', function(req, res){
 });
 
 //------WEB SERVICES DE ADMIN PANEL--------------------------
-app.post('/crearDispositivo', router, function(req, res){
+app.post('/adminCrearDispositivo', router, function(req, res){
 	var permiso = verificarAdmin(req.decoded.correo)
 	if(permiso==1){
 		regis = mongoose.model("Dispositivo", esquemaDispositivo);
@@ -1111,7 +1111,49 @@ app.post('/crearDispositivo', router, function(req, res){
 	}
 });
 
+app.post('/adminVerUsuarios', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Usuarios", esquemaUsuario);
+		regis.find().sort({"fechaRegis": 1}).exec(function(err,result){
+		  if (err) throw err;
+		  res.json(result);
+		});
+	}
+});
 
+app.post('/adminVerClientes', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Cliente", esquemaCliente);
+		regis.find().sort({"fechaRegis": 1}).exec(function(err,result){
+		  if (err) throw err;
+		  res.json(result);
+		});
+	}
+});
+
+app.post('/adminVerDispositivos', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Dispositivo", esquemaDispositivo);
+		regis.find().sort({"fechaRegis": 1}).exec(function(err,result){
+		  if (err) throw err;
+		  res.json(result);
+		});
+	}
+});
+
+app.post('/adminVerAllegados', router, function(req, res){
+	var permiso = verificarAdmin(req.decoded.correo)
+	if(permiso==1){
+		regis = mongoose.model("Asociado", esquemaAsociado);
+		regis.find().sort({"fechaRegis": 1}).exec(function(err,result){
+		  if (err) throw err;
+		  res.json(result);
+		});
+	}
+});
 //-----------------------------------------------------------
 
 //------------------------------ Version 1 ----------------------------------
