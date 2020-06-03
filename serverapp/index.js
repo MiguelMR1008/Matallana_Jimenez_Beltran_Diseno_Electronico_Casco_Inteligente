@@ -107,7 +107,7 @@ client.on('message', function(topic, message){
         }
         //Siempre manda info x socketio
         io.emit(payload_l.IDdisp,datos2)
-        console.log("Estes es el ID: "+payload_l.IDdisp)
+        console.log("Este es el ID: "+payload_l.IDdisp)
         console.log(datos2)
         /*res.json({ 
             mensaje : "Registro exitoso",
@@ -537,9 +537,9 @@ app.post('/registroDispositivo',router, function (req, res){
 			}else{
 				console.log("Consulta OK")
 				if(result){
-					if(result.correoUsuario==""){		
+					if(result.correoUsuario==" "){		
 						query = {
-							correoUsuario: ""
+							correoUsuario: " "
 						}
 						regis.collection.update(query,				//No se puede hacer el query en update utilizando la variable _id porque es de tipo ObjectID y paila
 						{
